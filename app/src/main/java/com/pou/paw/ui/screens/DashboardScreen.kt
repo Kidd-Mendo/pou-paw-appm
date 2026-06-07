@@ -1,6 +1,7 @@
 package com.pou.paw.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,7 +28,11 @@ import com.pou.paw.data.model.Plant
 import com.pou.paw.ui.theme.*
 
 @Composable
-fun DashboardScreen(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
+fun DashboardScreen(
+    onAddClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    onProfileClick: () -> Unit
+) {
     val context = LocalContext.current
     val repository = (context.applicationContext as PouPawApplication).repository
     val reminders by repository.reminders.collectAsState(initial = emptyList())
@@ -41,7 +46,7 @@ fun DashboardScreen(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
     )
 
     Scaffold(
-        bottomBar = { BottomNavBar(onAddClick, onSettingsClick) },
+        bottomBar = { BottomNavBar(onAddClick, onSettingsClick, onProfileClick) },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
@@ -51,16 +56,28 @@ fun DashboardScreen(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            HeaderSection()
+            HeaderSection(onProfileClick)
             Spacer(modifier = Modifier.height(24.dp))
             FilterSection(selectedFilter) { selectedFilter = it }
             Spacer(modifier = Modifier.height(20.dp))
             
             val filteredItems = (initialItems + reminders.map { reminder ->
                 if (reminder.category == "Mascota") {
-                    Pet(name = reminder.targetId, type = reminder.action, breed = reminder.frequency, imageUrl = reminder.imageUri)
+                    Pet(
+                        id = reminder.id,
+                        name = reminder.targetId,
+                        type = reminder.breedOrType,
+                        breed = reminder.action,
+                        imageUrl = reminder.imageUri
+                    )
                 } else {
-                    Plant(name = reminder.targetId, type = reminder.action, species = reminder.frequency, imageUrl = reminder.imageUri)
+                    Plant(
+                        id = reminder.id,
+                        name = reminder.targetId,
+                        type = reminder.breedOrType,
+                        species = reminder.action,
+                        imageUrl = reminder.imageUri
+                    )
                 }
             }).filter { item ->
                 when (selectedFilter) {
@@ -86,7 +103,7 @@ fun DashboardScreen(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
 }
 
 @Composable
-fun HeaderSection() {
+fun HeaderSection(onProfileClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -101,7 +118,7 @@ fun HeaderSection() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Pou-Paw",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
@@ -112,6 +129,7 @@ fun HeaderSection() {
                 .size(45.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.secondaryContainer)
+                .clickable { onProfileClick() }
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
@@ -296,7 +314,7 @@ fun NeedIndicator(name: String, level: Float, icon: ImageVector, color: Color) {
 }
 
 @Composable
-fun BottomNavBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
+fun BottomNavBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit, onProfileClick: () -> Unit) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp,
@@ -339,7 +357,7 @@ fun BottomNavBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
             icon = { Icon(Icons.Default.PersonOutline, contentDescription = null) },
             label = { Text(stringResource(R.string.nav_profile)) },
             selected = false,
-            onClick = { },
+            onClick = onProfileClick,
             colors = NavigationBarItemDefaults.colors(
                 unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                 unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)

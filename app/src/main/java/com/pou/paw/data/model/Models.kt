@@ -49,6 +49,7 @@ data class Reminder(
     val id: String = UUID.randomUUID().toString(),
     val targetId: String, // Pet or Plant Name
     val category: String, // "Mascota" or "Planta"
+    val breedOrType: String,
     val action: String,
     val frequency: String,
     val message: String,

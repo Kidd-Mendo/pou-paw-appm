@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Root &amp; Paw</string>
+    <string name="app_name">Pou-Paw</string>
     <string name="settings_title">Configuración</string>
     <string name="back">Atrás</string>
     <string name="section_account">Cuenta</string>
@@ -24,9 +24,9 @@
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
     <string name="profile_updated">Perfil actualizado</string>
-    <string name="about_title">Acerca de Root &amp; Paw</string>
+    <string name="about_title">Acerca de Pou-Paw</string>
     <string name="close">Cerrar</string>
-    <string name="about_description">Versión 1.0.0 (Beta)\n\nTu asistente para el cuidado de mascotas y plantas.\n\nDesarrollado con ❤️ para Root &amp; Paw.</string>
+    <string name="about_description">Versión 1.0.0 (Beta)\n\nTu asistente para el cuidado de mascotas y plantas.\n\nDesarrollado con ❤️ para Pou-Paw.</string>
     <string name="coming_soon">La función \u0027%1$s\u0027 próximamente.</string>
     <string name="error_link">Error al abrir el enlace</string>
     <string name="login_title">Pou-Paw</string>
@@ -55,4 +55,36 @@
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_add">Añadir</string>
     <string name="nav_profile">Perfil</string>
+    <string name="history_title">Historial y Estadísticas</string>
+    <string name="current_streak">Racha Actual: %1$d días</string>
+    <string name="total_tasks">Tareas Totales: %1$d</string>
+    <string name="achievements_title">Logros</string>
+    <string name="new_reminder_title">NUEVO RECORDATORIO</string>
+    <string name="add_photo">Añadir foto</string>
+    <string name="write_name_placeholder">Escribir nombre</string>
+    <string name="pet_breed_placeholder">Raza de mascota</string>
+    <string name="plant_type_placeholder">Tipo de planta</string>
+    <string name="category_label">Categoría</string>
+    <string name="category_pet">Mascota</string>
+    <string name="category_plant">Planta</string>
+    <string name="action_label">3. Acción</string>
+    <string name="frequency_label">4. Frecuencia</string>
+    <string name="message_label">5. Mensaje</string>
+    <string name="message_placeholder">Escribe un mensaje recordatorio</string>
+    <string name="create_reminder_button">CREAR RECORDATORIO</string>
+    <string name="cancel_button">CANCELAR</string>
+    <string name="frequency_daily">Diario</string>
+    <string name="frequency_hours">Cada X Horas</string>
+    <string name="frequency_days">Cada X Días</string>
+    <string name="frequency_once_daily">Una vez al día</string>
+    <string name="frequency_every_hours">Cada %1$d horas</string>
+    <string name="frequency_every_days">Cada %1$d días</string>
+    <string name="back_label">Volver</string>
+    <string name="theme_dialog_title">Seleccionar Tema</string>
+    <string name="language_dialog_title">Seleccionar Idioma</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Sistema</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_en">English</string>
 </resources>

@@ -24,12 +24,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.pou.paw.PouPawApplication
+import com.pou.paw.R
 import com.pou.paw.data.model.Reminder
 import com.pou.paw.ui.theme.*
 import kotlinx.coroutines.launch
@@ -86,12 +88,12 @@ fun AddEntityScreen(onBack: () -> Unit) {
                 navigationIcon = {
                     TextButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBackIos, null, modifier = Modifier.size(16.dp), tint = DarkOlive)
-                        Text("Volver", color = DarkOlive, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.back_label), color = DarkOlive, fontWeight = FontWeight.Bold)
                     }
                 },
                 actions = {
                     Text(
-                        "NUEVO RECORDATORIO",
+                        stringResource(R.string.new_reminder_title),
                         modifier = Modifier.padding(end = 16.dp),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
@@ -128,7 +130,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         if (imageUri != null) {
                             AsyncImage(
                                 model = imageUri,
-                                contentDescription = "Foto seleccionada",
+                                contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
@@ -136,11 +138,11 @@ fun AddEntityScreen(onBack: () -> Unit) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(
                                     imageVector = Icons.Default.AddAPhoto,
-                                    contentDescription = "Subir foto",
+                                    contentDescription = stringResource(R.string.add_photo),
                                     tint = OliveGreen,
                                     modifier = Modifier.size(40.dp)
                                 )
-                                Text("Añadir foto", fontSize = 11.sp, color = OliveGreen, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.add_photo), fontSize = 11.sp, color = OliveGreen, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -154,7 +156,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         ) {
                             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f, fill = false)) {
                                 if (name.isEmpty()) {
-                                    Text("Escribir nombre", style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, color = TextGray.copy(alpha = 0.5f)))
+                                    Text(stringResource(R.string.write_name_placeholder), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, color = TextGray.copy(alpha = 0.5f)))
                                 }
                                 BasicTextField(
                                     value = name,
@@ -176,7 +178,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f, fill = false)) {
                                 if (breedOrType.isEmpty()) {
                                     Text(
-                                        if (selectedCategory == "Mascota") "Raza de mascota" else "Tipo de planta",
+                                        if (selectedCategory == "Mascota") stringResource(R.string.pet_breed_placeholder) else stringResource(R.string.plant_type_placeholder),
                                         style = MaterialTheme.typography.bodyMedium.copy(color = TextGray.copy(alpha = 0.5f))
                                     )
                                 }
@@ -206,7 +208,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Categoría
-            Text("Categoría", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+            Text(stringResource(R.string.category_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
@@ -217,7 +219,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         containerColor = if (selectedCategory == "Mascota") DarkOlive else Color.White
                     )
                 ) {
-                    Text("Mascota", color = if (selectedCategory == "Mascota") Color.White else DarkOlive)
+                    Text(stringResource(R.string.category_pet), color = if (selectedCategory == "Mascota") Color.White else DarkOlive)
                 }
                 Button(
                     onClick = { selectedCategory = "Planta" },
@@ -227,14 +229,14 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         containerColor = if (selectedCategory == "Planta") DarkOlive else Color.White
                     )
                 ) {
-                    Text("Planta", color = if (selectedCategory == "Planta") Color.White else DarkOlive)
+                    Text(stringResource(R.string.category_plant), color = if (selectedCategory == "Planta") Color.White else DarkOlive)
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Acción
-            Text("3. Acción", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+            Text(stringResource(R.string.action_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ExposedDropdownMenuBox(
                 expanded = expandedAction,
@@ -274,7 +276,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             // 4. Frecuencia
-            Text("4. Frecuencia", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+            Text(stringResource(R.string.frequency_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 nextDays.forEach { date ->
@@ -289,9 +291,9 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                FrequencyTypeOption("Diario", selectedFrequencyType == "Diario") { selectedFrequencyType = "Diario" }
-                FrequencyTypeOption("Cada X Horas", selectedFrequencyType == "Cada X Horas") { selectedFrequencyType = "Cada X Horas" }
-                FrequencyTypeOption("Cada X Días", selectedFrequencyType == "Cada X Días") { selectedFrequencyType = "Cada X Días" }
+                FrequencyTypeOption(stringResource(R.string.frequency_daily), selectedFrequencyType == "Diario") { selectedFrequencyType = "Diario" }
+                FrequencyTypeOption(stringResource(R.string.frequency_hours), selectedFrequencyType == "Cada X Horas") { selectedFrequencyType = "Cada X Horas" }
+                FrequencyTypeOption(stringResource(R.string.frequency_days), selectedFrequencyType == "Cada X Días") { selectedFrequencyType = "Cada X Días" }
             }
             
             Slider(
@@ -306,9 +308,9 @@ fun AddEntityScreen(onBack: () -> Unit) {
             )
             
             val frequencyText = when(selectedFrequencyType) {
-                "Diario" -> "Una vez al día"
-                "Cada X Horas" -> "Cada ${frequencyValue.toInt()} horas"
-                "Cada X Días" -> "Cada ${frequencyValue.toInt()} días"
+                "Diario" -> stringResource(R.string.frequency_once_daily)
+                "Cada X Horas" -> stringResource(R.string.frequency_every_hours, frequencyValue.toInt())
+                "Cada X Días" -> stringResource(R.string.frequency_every_days, frequencyValue.toInt())
                 else -> ""
             }
             Text(frequencyText, modifier = Modifier.align(Alignment.End), fontWeight = FontWeight.Bold, color = DarkOlive)
@@ -316,12 +318,12 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Mensaje
-            Text("5. Mensaje", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+            Text(stringResource(R.string.message_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
-                placeholder = { Text("Escribe un mensaje recordatorio") },
+                placeholder = { Text(stringResource(R.string.message_placeholder)) },
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -341,6 +343,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                                 id = UUID.randomUUID().toString(),
                                 targetId = name,
                                 category = selectedCategory,
+                                breedOrType = breedOrType,
                                 action = selectedAction,
                                 frequency = frequencyText,
                                 message = message,
@@ -356,14 +359,14 @@ fun AddEntityScreen(onBack: () -> Unit) {
                 shape = RoundedCornerShape(27.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)
             ) {
-                Text("CREAR RECORDATORIO", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.create_reminder_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
             
             TextButton(
                 onClick = onBack,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("CANCELAR", color = TextGray, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.cancel_button), color = TextGray, fontWeight = FontWeight.Bold)
             }
         }
     }

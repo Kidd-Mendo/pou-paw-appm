@@ -9,6 +9,9 @@ import com.pou.paw.ui.screens.AddEntityScreen
 import com.pou.paw.ui.screens.LoginScreen
 import com.pou.paw.ui.screens.SettingsScreen
 
+import com.pou.paw.ui.screens.HistoryScreen
+import com.pou.paw.data.model.UserStats
+
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -24,7 +27,8 @@ fun AppNavigation() {
         composable("dashboard") {
             DashboardScreen(
                 onAddClick = { navController.navigate("add") },
-                onSettingsClick = { navController.navigate("settings") }
+                onSettingsClick = { navController.navigate("settings") },
+                onProfileClick = { navController.navigate("history") }
             )
         }
         composable("add") {
@@ -38,6 +42,16 @@ fun AppNavigation() {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable("history") {
+            HistoryScreen(
+                stats = UserStats(
+                    streakDays = 5,
+                    totalTasksCompleted = 12,
+                    achievements = listOf("Primer Paso", "Cuidador Estrella")
+                ),
+                onBack = { navController.popBackStack() }
             )
         }
     }
