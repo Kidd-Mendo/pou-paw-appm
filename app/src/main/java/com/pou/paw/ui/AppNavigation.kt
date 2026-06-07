@@ -9,6 +9,7 @@ import com.pou.paw.ui.screens.AddEntityScreen
 import com.pou.paw.ui.screens.LoginScreen
 import com.pou.paw.ui.screens.SettingsScreen
 
+import com.pou.paw.ui.screens.ProfileScreen
 import com.pou.paw.ui.screens.HistoryScreen
 import com.pou.paw.data.model.UserStats
 
@@ -28,7 +29,7 @@ fun AppNavigation() {
             DashboardScreen(
                 onAddClick = { navController.navigate("add") },
                 onSettingsClick = { navController.navigate("settings") },
-                onProfileClick = { navController.navigate("history") }
+                onProfileClick = { navController.navigate("profile") }
             )
         }
         composable("add") {
@@ -42,6 +43,17 @@ fun AppNavigation() {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable("profile") {
+            ProfileScreen(
+                onDashboardClick = { 
+                    navController.navigate("dashboard") {
+                        popUpTo("dashboard") { inclusive = true }
+                    }
+                },
+                onAddClick = { navController.navigate("add") },
+                onSettingsClick = { navController.navigate("settings") }
             )
         }
         composable("history") {

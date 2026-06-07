@@ -55,6 +55,13 @@
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_add">Añadir</string>
     <string name="nav_profile">Perfil</string>
+    <string name="my_profile">Mi Perfil</string>
+    <string name="full_name">Nombre completo</string>
+    <string name="reg_date">Fecha de registro</string>
+    <string name="summary">Resumen</string>
+    <string name="registered_pets">Mascotas registradas</string>
+    <string name="registered_plants">Plantas registradas</string>
+    <string name="active_reminders">Recordatorios activos</string>
     <string name="history_title">Historial y Estadísticas</string>
     <string name="current_streak">Racha Actual: %1$d días</string>
     <string name="total_tasks">Tareas Totales: %1$d</string>
