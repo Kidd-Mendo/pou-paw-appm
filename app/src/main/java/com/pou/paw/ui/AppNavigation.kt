@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pou.paw.ui.screens.DashboardScreen
 import com.pou.paw.ui.screens.AddEntityScreen
 import com.pou.paw.ui.screens.LoginScreen
+import com.pou.paw.ui.screens.SettingsScreen
 
 @Composable
 fun AppNavigation() {
@@ -21,10 +22,23 @@ fun AppNavigation() {
             })
         }
         composable("dashboard") {
-            DashboardScreen(onAddClick = { navController.navigate("add") })
+            DashboardScreen(
+                onAddClick = { navController.navigate("add") },
+                onSettingsClick = { navController.navigate("settings") }
+            )
         }
         composable("add") {
             AddEntityScreen(onBack = { navController.popBackStack() })
+        }
+        composable("settings") {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() },
+                onLogoutClick = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

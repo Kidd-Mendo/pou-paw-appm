@@ -19,13 +19,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.pou.paw.R
 import com.pou.paw.PouPawApplication
 import com.pou.paw.data.model.Pet
 import com.pou.paw.data.model.Plant
 import com.pou.paw.ui.theme.*
 
 @Composable
-fun DashboardScreen(onAddClick: () -> Unit) {
+fun DashboardScreen(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
     val context = LocalContext.current
     val repository = (context.applicationContext as PouPawApplication).repository
     val reminders by repository.reminders.collectAsState(initial = emptyList())
@@ -39,8 +41,8 @@ fun DashboardScreen(onAddClick: () -> Unit) {
     )
 
     Scaffold(
-        bottomBar = { BottomNavBar(onAddClick) },
-        containerColor = CreamBackground
+        bottomBar = { BottomNavBar(onAddClick, onSettingsClick) },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -62,8 +64,8 @@ fun DashboardScreen(onAddClick: () -> Unit) {
                 }
             }).filter { item ->
                 when (selectedFilter) {
-                    "Mascotas" -> item is Pet
-                    "Plantas" -> item is Plant
+                    stringResource(R.string.filter_pets) -> item is Pet
+                    stringResource(R.string.filter_plants) -> item is Plant
                     else -> true
                 }
             }
@@ -94,14 +96,14 @@ fun HeaderSection() {
             Icon(
                 imageVector = Icons.Default.Pets,
                 contentDescription = null,
-                tint = OliveGreen,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(32.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Pou-Paw",
                 style = MaterialTheme.typography.titleLarge,
-                color = DarkOlive,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -109,36 +111,39 @@ fun HeaderSection() {
             modifier = Modifier
                 .size(45.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.Center),
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
     }
     Spacer(modifier = Modifier.height(16.dp))
     Text(
-        text = "¡Hola, Ana!",
+        text = stringResource(R.string.welcome_user, "Ana"),
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.ExtraBold,
-        color = TextBlack
+        color = MaterialTheme.colorScheme.onBackground
     )
     Text(
-        text = "Tus amigos te necesitan.",
+        text = stringResource(R.string.dashboard_subtitle),
         style = MaterialTheme.typography.bodyLarge,
-        color = TextGray
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
     )
 }
 
 @Composable
 fun FilterSection(selected: String, onFilterSelected: (String) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        FilterItem("Todos", Icons.Default.Apps, selected == "Todos") { onFilterSelected("Todos") }
-        FilterItem("Mascotas", Icons.Default.Pets, selected == "Mascotas") { onFilterSelected("Mascotas") }
-        FilterItem("Plantas", Icons.Default.Eco, selected == "Plantas") { onFilterSelected("Plantas") }
+        val all = stringResource(R.string.filter_all)
+        val pets = stringResource(R.string.filter_pets)
+        val plants = stringResource(R.string.filter_plants)
+        FilterItem(all, Icons.Default.Apps, selected == all) { onFilterSelected(all) }
+        FilterItem(pets, Icons.Default.Pets, selected == pets) { onFilterSelected(pets) }
+        FilterItem(plants, Icons.Default.Eco, selected == plants) { onFilterSelected(plants) }
     }
 }
 
@@ -147,7 +152,7 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
-        color = if (isSelected) DarkOlive else ChipUnselected,
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer,
         modifier = Modifier.height(40.dp)
     ) {
         Row(
@@ -157,13 +162,13 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isSelected) Color.White else DarkOlive,
+                tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = text,
-                color = if (isSelected) Color.White else DarkOlive,
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -175,7 +180,7 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
 fun PetCard(pet: Pet) {
     Card(
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -184,43 +189,43 @@ fun PetCard(pet: Pet) {
                     modifier = Modifier
                         .size(90.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(LightSage)
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Pets,
                         contentDescription = null,
                         modifier = Modifier.align(Alignment.Center).size(40.dp),
-                        tint = OliveGreen
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Text(text = pet.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Icon(Icons.Default.Pets, null, tint = OliveGreen, modifier = Modifier.size(20.dp))
+                        Text(text = pet.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Icon(Icons.Default.Pets, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                     }
-                    Text(text = pet.type, style = MaterialTheme.typography.bodyMedium, color = TextGray)
+                    Text(text = pet.type, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Schedule, null, tint = Color.Red, modifier = Modifier.size(14.dp))
+                        Icon(Icons.Default.Schedule, null, tint = ProgressRed, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = pet.breed, color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(text = pet.breed, color = ProgressRed, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
-                NeedIndicator("Comida", 0.4f, Icons.Default.Restaurant, ProgressRed)
-                NeedIndicator("Agua", 0.8f, Icons.Default.WaterDrop, ProgressBlue)
-                NeedIndicator("Limpieza", 0.2f, Icons.Default.CleaningServices, ProgressGreen)
+                NeedIndicator(stringResource(R.string.need_food), 0.4f, Icons.Default.Restaurant, ProgressRed)
+                NeedIndicator(stringResource(R.string.need_water), 0.8f, Icons.Default.WaterDrop, ProgressBlue)
+                NeedIndicator(stringResource(R.string.need_cleaning), 0.2f, Icons.Default.CleaningServices, ProgressGreen)
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = { },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(25.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = ActionSalmon)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
             ) {
-                Text("Alimentar", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.action_feed), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onTertiary)
             }
         }
     }
@@ -230,7 +235,7 @@ fun PetCard(pet: Pet) {
 fun PlantCard(plant: Plant) {
     Card(
         shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -239,34 +244,34 @@ fun PlantCard(plant: Plant) {
                     modifier = Modifier
                         .size(90.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(LightSage)
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Eco,
                         contentDescription = null,
                         modifier = Modifier.align(Alignment.Center).size(40.dp),
-                        tint = OliveGreen
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Text(text = plant.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Icon(Icons.Default.Eco, null, tint = OliveGreen, modifier = Modifier.size(20.dp))
+                        Text(text = plant.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Icon(Icons.Default.Eco, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                     }
-                    Text(text = plant.species, style = MaterialTheme.typography.bodyMedium, color = TextGray)
+                    Text(text = plant.species, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.CheckCircle, null, tint = ProgressGreen, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Satisfecho", color = ProgressGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.status_satisfied), color = ProgressGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
-                NeedIndicator("Agua", 0.75f, Icons.Default.WaterDrop, ProgressBlue)
-                NeedIndicator("Luz", 0.9f, Icons.Default.WbSunny, ProgressYellow)
-                NeedIndicator("Nutriente", 0.4f, Icons.Default.Grass, ProgressGreen)
+                NeedIndicator(stringResource(R.string.need_water), 0.75f, Icons.Default.WaterDrop, ProgressBlue)
+                NeedIndicator(stringResource(R.string.need_light), 0.9f, Icons.Default.WbSunny, ProgressYellow)
+                NeedIndicator(stringResource(R.string.need_nutrient), 0.4f, Icons.Default.Grass, ProgressGreen)
             }
         }
     }
@@ -281,52 +286,64 @@ fun NeedIndicator(name: String, level: Float, icon: ImageVector, color: Color) {
                 modifier = Modifier.fillMaxSize(),
                 strokeWidth = 6.dp,
                 color = color,
-                trackColor = ChipUnselected
+                trackColor = MaterialTheme.colorScheme.secondaryContainer
             )
             Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = name, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextGray)
+        Text(text = name, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
     }
 }
 
 @Composable
-fun BottomNavBar(onAddClick: () -> Unit) {
+fun BottomNavBar(onAddClick: () -> Unit, onSettingsClick: () -> Unit) {
     NavigationBar(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp,
         modifier = Modifier.clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Dashboard, contentDescription = null) },
-            label = { Text("Dashboard") },
+            label = { Text(stringResource(R.string.nav_dashboard)) },
             selected = true,
             onClick = { },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = DarkOlive,
-                selectedTextColor = DarkOlive,
-                unselectedIconColor = Color.Gray,
-                unselectedTextColor = Color.Gray,
-                indicatorColor = LightSage
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer
             )
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.AddCircleOutline, contentDescription = null) },
-            label = { Text("Añadir") },
+            label = { Text(stringResource(R.string.nav_add)) },
             selected = false,
-            onClick = onAddClick
+            onClick = onAddClick,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-            label = { Text("Configuración") },
+            label = { Text(stringResource(R.string.settings_title)) },
             selected = false,
-            onClick = { }
+            onClick = onSettingsClick,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.PersonOutline, contentDescription = null) },
-            label = { Text("Perfil") },
+            label = { Text(stringResource(R.string.nav_profile)) },
             selected = false,
-            onClick = { }
+            onClick = { },
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
         )
     }
 }

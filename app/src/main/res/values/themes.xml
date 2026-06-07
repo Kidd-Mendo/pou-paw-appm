@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.PouPaw" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- El parent DEBE ser Theme.AppCompat para que no se cierre la app al usar AppCompatActivity -->
+    <style name="Theme.PouPaw" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 </resources>

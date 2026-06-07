@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.pou.paw.R
 import com.pou.paw.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,13 +50,13 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             modifier = Modifier.size(80.dp)
         )
         Text(
-            text = "Pou-Paw",
+            text = stringResource(R.string.login_title),
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.ExtraBold,
             color = DarkOlive
         )
         Text(
-            text = if (isRegistering) "Crea tu cuenta" else "Cuida a tus amigos con amor",
+            text = if (isRegistering) stringResource(R.string.register_subtitle) else stringResource(R.string.login_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = TextGray
         )
@@ -64,7 +66,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Correo electrónico") },
+            label = { Text(stringResource(R.string.email_label)) },
             leadingIcon = { Icon(Icons.Default.Email, null, tint = OliveGreen) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -79,7 +81,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Contraseña") },
+            label = { Text(stringResource(R.string.password_label)) },
             leadingIcon = { Icon(Icons.Default.Lock, null, tint = OliveGreen) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -106,14 +108,14 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                             onLoginSuccess()
                         }
                     } else {
-                        Toast.makeText(context, "Completa los campos", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.complete_fields), Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)
             ) {
-                Text(if (isRegistering) "REGISTRARSE" else "INICIAR SESIÓN", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(if (isRegistering) stringResource(R.string.register_button) else stringResource(R.string.login_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,7 +136,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 ) {
                     Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("CONTINUAR CON GOOGLE", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.google_login), fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -142,7 +144,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
             TextButton(onClick = { isRegistering = !isRegistering }) {
                 Text(
-                    text = if (isRegistering) "¿Ya tienes cuenta? Inicia sesión" else "¿No tienes cuenta? Regístrate",
+                    text = if (isRegistering) stringResource(R.string.has_account) else stringResource(R.string.no_account),
                     color = DarkOlive,
                     fontWeight = FontWeight.Bold
                 )

@@ -64,7 +64,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
     
     var selectedAction by remember { mutableStateOf(petActions[0]) }
     var expandedAction by remember { mutableStateOf(false) }
-    
+
     var selectedFrequencyType by remember { mutableStateOf("Diario") }
     var frequencyValue by remember { mutableFloatStateOf(10f) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
