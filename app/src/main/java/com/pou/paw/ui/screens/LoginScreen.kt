@@ -25,15 +25,27 @@ import com.pou.paw.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+import com.pou.paw.ui.viewmodel.LoginViewModel
+
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isRegistering by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    
+fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
+    // Escuchar el evento de éxito para navegar
+    LaunchedEffect(Unit) {
+        viewModel.loginSuccess.collect {
+            onLoginSuccess()
+        }
+    }
+
+    // Mostrar mensaje de error si existe
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -56,7 +68,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             color = DarkOlive
         )
         Text(
-            text = if (isRegistering) stringResource(R.string.register_subtitle) else stringResource(R.string.login_subtitle),
+            text = if (uiState.isRegistering) stringResource(R.string.register_subtitle) else stringResource(R.string.login_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = TextGray
         )
@@ -64,8 +76,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(48.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = uiState.email,
+            onValueChange = { viewModel.onEmailChange(it) },
             label = { Text(stringResource(R.string.email_label)) },
             leadingIcon = { Icon(Icons.Default.Email, null, tint = OliveGreen) },
             modifier = Modifier.fillMaxWidth(),
@@ -79,8 +91,8 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = uiState.password,
+            onValueChange = { viewModel.onPasswordChange(it) },
             label = { Text(stringResource(R.string.password_label)) },
             leadingIcon = { Icon(Icons.Default.Lock, null, tint = OliveGreen) },
             visualTransformation = PasswordVisualTransformation(),
@@ -94,42 +106,23 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (isLoading) {
+        if (uiState.isLoading) {
             CircularProgressIndicator(color = OliveGreen)
         } else {
             Button(
-                onClick = {
-                    if (email.isNotBlank() && password.isNotBlank()) {
-                        isLoading = true
-                        scope.launch {
-                            // Simulamos proceso de autenticación para evitar crashes de Firebase
-                            delay(800)
-                            isLoading = false
-                            onLoginSuccess()
-                        }
-                    } else {
-                        Toast.makeText(context, context.getString(R.string.complete_fields), Toast.LENGTH_SHORT).show()
-                    }
-                },
+                onClick = { viewModel.login() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)
             ) {
-                Text(if (isRegistering) stringResource(R.string.register_button) else stringResource(R.string.login_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(if (uiState.isRegistering) stringResource(R.string.register_button) else stringResource(R.string.login_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (!isRegistering) {
+            if (!uiState.isRegistering) {
                 OutlinedButton(
-                    onClick = {
-                        isLoading = true
-                        scope.launch {
-                            delay(800)
-                            isLoading = false
-                            onLoginSuccess()
-                        }
-                    },
+                    onClick = { viewModel.loginWithGoogle() },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = DarkOlive)
@@ -142,9 +135,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = { isRegistering = !isRegistering }) {
+            TextButton(onClick = { viewModel.toggleRegistering() }) {
                 Text(
-                    text = if (isRegistering) stringResource(R.string.has_account) else stringResource(R.string.no_account),
+                    text = if (uiState.isRegistering) stringResource(R.string.has_account) else stringResource(R.string.no_account),
                     color = DarkOlive,
                     fontWeight = FontWeight.Bold
                 )

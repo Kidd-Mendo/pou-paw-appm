@@ -40,17 +40,13 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
 
+import com.pou.paw.ui.viewmodel.AddEntityViewModel
+import com.pou.paw.ui.viewmodel.AddEntityUiState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntityScreen(onBack: () -> Unit) {
-    val context = LocalContext.current
-    val repository = (context.applicationContext as PouPawApplication).repository
-    val scope = rememberCoroutineScope()
-    
-    var name by remember { mutableStateOf("") }
-    var breedOrType by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf("Mascota") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
+    val uiState by viewModel.uiState.collectAsState()
     
     val nameFocusRequester = remember { FocusRequester() }
     val breedFocusRequester = remember { FocusRequester() }
@@ -58,27 +54,21 @@ fun AddEntityScreen(onBack: () -> Unit) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        imageUri = uri
+        viewModel.onImageUriChange(uri)
     }
 
     val petActions = listOf("Comida", "Agua", "Pasear", "Limpieza", "Medicina")
     val plantActions = listOf("Regar", "Sacar al sol", "Nutrientes", "Limpiar hojas", "Trasplantar")
-    
-    var selectedAction by remember { mutableStateOf(petActions[0]) }
-    var expandedAction by remember { mutableStateOf(false) }
-
-    var selectedFrequencyType by remember { mutableStateOf("Diario") }
-    var frequencyValue by remember { mutableFloatStateOf(10f) }
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     val nextDays = remember {
         (0..4).map { LocalDate.now().plusDays(it.toLong()) }
     }
 
-    var message by remember { mutableStateOf("") }
-
-    LaunchedEffect(selectedCategory) {
-        selectedAction = if (selectedCategory == "Mascota") petActions[0] else plantActions[0]
+    // Escuchar el evento de éxito para navegar hacia atrás
+    LaunchedEffect(Unit) {
+        viewModel.saveSuccess.collect {
+            onBack()
+        }
     }
 
     Scaffold(
@@ -127,9 +117,9 @@ fun AddEntityScreen(onBack: () -> Unit) {
                             .clickable { launcher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (imageUri != null) {
+                        if (uiState.imageUri != null) {
                             AsyncImage(
-                                model = imageUri,
+                                model = uiState.imageUri,
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
@@ -155,12 +145,12 @@ fun AddEntityScreen(onBack: () -> Unit) {
                             modifier = Modifier.clickable { nameFocusRequester.requestFocus() }
                         ) {
                             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f, fill = false)) {
-                                if (name.isEmpty()) {
+                                if (uiState.name.isEmpty()) {
                                     Text(stringResource(R.string.write_name_placeholder), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, color = TextGray.copy(alpha = 0.5f)))
                                 }
                                 BasicTextField(
-                                    value = name,
-                                    onValueChange = { name = it },
+                                    value = uiState.name,
+                                    onValueChange = { viewModel.onNameChange(it) },
                                     textStyle = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, color = TextBlack),
                                     modifier = Modifier.focusRequester(nameFocusRequester),
                                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -176,15 +166,15 @@ fun AddEntityScreen(onBack: () -> Unit) {
                             modifier = Modifier.padding(top = 2.dp).clickable { breedFocusRequester.requestFocus() }
                         ) {
                             Box(contentAlignment = Alignment.CenterStart, modifier = Modifier.weight(1f, fill = false)) {
-                                if (breedOrType.isEmpty()) {
+                                if (uiState.breedOrType.isEmpty()) {
                                     Text(
-                                        if (selectedCategory == "Mascota") stringResource(R.string.pet_breed_placeholder) else stringResource(R.string.plant_type_placeholder),
+                                        if (uiState.selectedCategory == "Mascota") stringResource(R.string.pet_breed_placeholder) else stringResource(R.string.plant_type_placeholder),
                                         style = MaterialTheme.typography.bodyMedium.copy(color = TextGray.copy(alpha = 0.5f))
                                     )
                                 }
                                 BasicTextField(
-                                    value = breedOrType,
-                                    onValueChange = { breedOrType = it },
+                                    value = uiState.breedOrType,
+                                    onValueChange = { viewModel.onBreedChange(it) },
                                     textStyle = MaterialTheme.typography.bodyMedium.copy(color = TextGray),
                                     modifier = Modifier.focusRequester(breedFocusRequester),
                                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
@@ -196,7 +186,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         }
                         
                         Icon(
-                            imageVector = if (selectedCategory == "Mascota") Icons.Default.Pets else Icons.Default.Eco,
+                            imageVector = if (uiState.selectedCategory == "Mascota") Icons.Default.Pets else Icons.Default.Eco,
                             null,
                             tint = OliveGreen,
                             modifier = Modifier.padding(top = 8.dp).size(32.dp)
@@ -212,24 +202,24 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
-                    onClick = { selectedCategory = "Mascota" },
+                    onClick = { viewModel.onCategoryChange("Mascota") },
                     modifier = Modifier.weight(1f).height(45.dp),
                     shape = RoundedCornerShape(22.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedCategory == "Mascota") DarkOlive else Color.White
+                        containerColor = if (uiState.selectedCategory == "Mascota") DarkOlive else Color.White
                     )
                 ) {
-                    Text(stringResource(R.string.category_pet), color = if (selectedCategory == "Mascota") Color.White else DarkOlive)
+                    Text(stringResource(R.string.category_pet), color = if (uiState.selectedCategory == "Mascota") Color.White else DarkOlive)
                 }
                 Button(
-                    onClick = { selectedCategory = "Planta" },
+                    onClick = { viewModel.onCategoryChange("Planta") },
                     modifier = Modifier.weight(1f).height(45.dp),
                     shape = RoundedCornerShape(22.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedCategory == "Planta") DarkOlive else Color.White
+                        containerColor = if (uiState.selectedCategory == "Planta") DarkOlive else Color.White
                     )
                 ) {
-                    Text(stringResource(R.string.category_plant), color = if (selectedCategory == "Planta") Color.White else DarkOlive)
+                    Text(stringResource(R.string.category_plant), color = if (uiState.selectedCategory == "Planta") Color.White else DarkOlive)
                 }
             }
 
@@ -239,12 +229,12 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Text(stringResource(R.string.action_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             ExposedDropdownMenuBox(
-                expanded = expandedAction,
-                onExpandedChange = { expandedAction = !expandedAction },
+                expanded = uiState.expandedAction,
+                onExpandedChange = { viewModel.onExpandedActionChange(it) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = selectedAction,
+                    value = uiState.selectedAction,
                     onValueChange = { },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth().menuAnchor(),
@@ -253,20 +243,19 @@ fun AddEntityScreen(onBack: () -> Unit) {
                         unfocusedContainerColor = Color.White,
                         focusedContainerColor = Color.White
                     ),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedAction) }
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.expandedAction) }
                 )
                 ExposedDropdownMenu(
-                    expanded = expandedAction,
-                    onDismissRequest = { expandedAction = false },
+                    expanded = uiState.expandedAction,
+                    onDismissRequest = { viewModel.onExpandedActionChange(false) },
                     modifier = Modifier.background(Color.White)
                 ) {
-                    val currentActions = if (selectedCategory == "Mascota") petActions else plantActions
+                    val currentActions = if (uiState.selectedCategory == "Mascota") petActions else plantActions
                     currentActions.forEach { action ->
                         DropdownMenuItem(
                             text = { Text(action) },
                             onClick = {
-                                selectedAction = action
-                                expandedAction = false
+                                viewModel.onActionChange(action)
                             }
                         )
                     }
@@ -282,8 +271,8 @@ fun AddEntityScreen(onBack: () -> Unit) {
                 nextDays.forEach { date ->
                     FrequencyDayItem(
                         date = date,
-                        isSelected = selectedDate == date,
-                        onClick = { selectedDate = date }
+                        isSelected = uiState.selectedDate == date,
+                        onClick = { viewModel.onDateChange(date) }
                     )
                 }
             }
@@ -291,15 +280,15 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                FrequencyTypeOption(stringResource(R.string.frequency_daily), selectedFrequencyType == "Diario") { selectedFrequencyType = "Diario" }
-                FrequencyTypeOption(stringResource(R.string.frequency_hours), selectedFrequencyType == "Cada X Horas") { selectedFrequencyType = "Cada X Horas" }
-                FrequencyTypeOption(stringResource(R.string.frequency_days), selectedFrequencyType == "Cada X Días") { selectedFrequencyType = "Cada X Días" }
+                FrequencyTypeOption(stringResource(R.string.frequency_daily), uiState.selectedFrequencyType == "Diario") { viewModel.onFrequencyTypeChange("Diario") }
+                FrequencyTypeOption(stringResource(R.string.frequency_hours), uiState.selectedFrequencyType == "Cada X Horas") { viewModel.onFrequencyTypeChange("Cada X Horas") }
+                FrequencyTypeOption(stringResource(R.string.frequency_days), uiState.selectedFrequencyType == "Cada X Días") { viewModel.onFrequencyTypeChange("Cada X Días") }
             }
             
             Slider(
-                value = frequencyValue,
-                onValueChange = { frequencyValue = it },
-                valueRange = if (selectedFrequencyType == "Cada X Días") 1f..30f else 1f..24f,
+                value = uiState.frequencyValue,
+                onValueChange = { viewModel.onFrequencyValueChange(it) },
+                valueRange = if (uiState.selectedFrequencyType == "Cada X Días") 1f..30f else 1f..24f,
                 colors = SliderDefaults.colors(
                     thumbColor = Color.White,
                     activeTrackColor = DarkOlive,
@@ -307,10 +296,10 @@ fun AddEntityScreen(onBack: () -> Unit) {
                 )
             )
             
-            val frequencyText = when(selectedFrequencyType) {
+            val frequencyText = when(uiState.selectedFrequencyType) {
                 "Diario" -> stringResource(R.string.frequency_once_daily)
-                "Cada X Horas" -> stringResource(R.string.frequency_every_hours, frequencyValue.toInt())
-                "Cada X Días" -> stringResource(R.string.frequency_every_days, frequencyValue.toInt())
+                "Cada X Horas" -> stringResource(R.string.frequency_every_hours, uiState.frequencyValue.toInt())
+                "Cada X Días" -> stringResource(R.string.frequency_every_days, uiState.frequencyValue.toInt())
                 else -> ""
             }
             Text(frequencyText, modifier = Modifier.align(Alignment.End), fontWeight = FontWeight.Bold, color = DarkOlive)
@@ -321,8 +310,8 @@ fun AddEntityScreen(onBack: () -> Unit) {
             Text(stringResource(R.string.message_label), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = message,
-                onValueChange = { message = it },
+                value = uiState.message,
+                onValueChange = { viewModel.onMessageChange(it) },
                 placeholder = { Text(stringResource(R.string.message_placeholder)) },
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 shape = RoundedCornerShape(12.dp),
@@ -336,25 +325,7 @@ fun AddEntityScreen(onBack: () -> Unit) {
 
             // Botones
             Button(
-                onClick = { 
-                    if (name.isNotBlank()) {
-                        scope.launch {
-                            val newReminder = Reminder(
-                                id = UUID.randomUUID().toString(),
-                                targetId = name,
-                                category = selectedCategory,
-                                breedOrType = breedOrType,
-                                action = selectedAction,
-                                frequency = frequencyText,
-                                message = message,
-                                nextOccurrence = System.currentTimeMillis(),
-                                imageUri = imageUri?.toString()
-                            )
-                            repository.addReminder(newReminder)
-                            onBack()
-                        }
-                    }
-                },
+                onClick = { viewModel.saveReminder() },
                 modifier = Modifier.fillMaxWidth().height(55.dp),
                 shape = RoundedCornerShape(27.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)

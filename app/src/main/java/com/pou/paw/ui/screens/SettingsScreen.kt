@@ -19,26 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pou.paw.R
 
+import com.pou.paw.ui.viewmodel.SettingsViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    viewModel: SettingsViewModel,
     onBackClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("root_paw_settings", Context.MODE_PRIVATE) }
-    
-    var showThemeDialog by remember { mutableStateOf(false) }
-    var showLanguageDialog by remember { mutableStateOf(false) }
-    var showAboutDialog by remember { mutableStateOf(false) }
-    var showProfileDialog by remember { mutableStateOf(false) }
-
-    var currentTheme by remember { 
-        mutableStateOf(prefs.getString("theme", "Claro") ?: "Claro") 
-    }
-    var currentLanguage by remember { 
-        mutableStateOf(prefs.getString("language", "Español") ?: "Español") 
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -65,7 +55,7 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Person,
                     title = stringResource(R.string.edit_profile),
-                    onClick = { showProfileDialog = true }
+                    onClick = { viewModel.toggleProfileDialog(true) }
                 )
                 SettingsItem(
                     icon = Icons.Default.Lock,
@@ -96,14 +86,14 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Palette,
                     title = stringResource(R.string.theme),
-                    subtitle = currentTheme,
-                    onClick = { showThemeDialog = true }
+                    subtitle = uiState.currentTheme,
+                    onClick = { viewModel.toggleThemeDialog(true) }
                 )
                 SettingsItem(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.language),
-                    subtitle = currentLanguage,
-                    onClick = { showLanguageDialog = true }
+                    subtitle = uiState.currentLanguage,
+                    onClick = { viewModel.toggleLanguageDialog(true) }
                 )
             }
 
@@ -116,7 +106,7 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.about),
-                    onClick = { showAboutDialog = true }
+                    onClick = { viewModel.toggleAboutDialog(true) }
                 )
             }
 
@@ -142,7 +132,7 @@ fun SettingsScreen(
     }
 
     // Dialogs
-    if (showThemeDialog) {
+    if (uiState.showThemeDialog) {
         val themes = listOf(
             stringResource(R.string.theme_light),
             stringResource(R.string.theme_dark),
@@ -151,17 +141,15 @@ fun SettingsScreen(
         SingleSelectDialog(
             title = stringResource(R.string.theme_dialog_title),
             options = themes,
-            selectedOption = currentTheme,
+            selectedOption = uiState.currentTheme,
             onOptionSelected = {
-                currentTheme = it
-                prefs.edit().putString("theme", it).apply()
-                showThemeDialog = false
+                viewModel.setTheme(it)
             },
-            onDismissRequest = { showThemeDialog = false }
+            onDismissRequest = { viewModel.toggleThemeDialog(false) }
         )
     }
 
-    if (showLanguageDialog) {
+    if (uiState.showLanguageDialog) {
         val languages = listOf(
             stringResource(R.string.lang_es),
             stringResource(R.string.lang_en)
@@ -169,35 +157,33 @@ fun SettingsScreen(
         SingleSelectDialog(
             title = stringResource(R.string.language_dialog_title),
             options = languages,
-            selectedOption = currentLanguage,
+            selectedOption = uiState.currentLanguage,
             onOptionSelected = {
-                currentLanguage = it
-                prefs.edit().putString("language", it).apply()
-                showLanguageDialog = false
+                viewModel.setLanguage(it)
             },
-            onDismissRequest = { showLanguageDialog = false }
+            onDismissRequest = { viewModel.toggleLanguageDialog(false) }
         )
     }
 
-    if (showAboutDialog) {
+    if (uiState.showAboutDialog) {
         AlertDialog(
-            onDismissRequest = { showAboutDialog = false },
+            onDismissRequest = { viewModel.toggleAboutDialog(false) },
             title = { Text(stringResource(R.string.about_title)) },
             text = { Text(stringResource(R.string.about_description)) },
             confirmButton = {
-                TextButton(onClick = { showAboutDialog = false }) {
+                TextButton(onClick = { viewModel.toggleAboutDialog(false) }) {
                     Text(stringResource(R.string.close))
                 }
             }
         )
     }
     
-    if (showProfileDialog) {
-        var name by remember { mutableStateOf(prefs.getString("user_name", "Ana") ?: "Ana") }
-        var email by remember { mutableStateOf(prefs.getString("user_email", "ana@example.com") ?: "ana@example.com") }
+    if (uiState.showProfileDialog) {
+        var name by remember { mutableStateOf(uiState.userName) }
+        var email by remember { mutableStateOf(uiState.userEmail) }
         
         AlertDialog(
-            onDismissRequest = { showProfileDialog = false },
+            onDismissRequest = { viewModel.toggleProfileDialog(false) },
             title = { Text(stringResource(R.string.dialog_edit_profile)) },
             text = {
                 Column {
@@ -216,14 +202,13 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    prefs.edit().putString("user_name", name).putString("user_email", email).apply()
-                    showProfileDialog = false
+                    viewModel.updateProfile(name, email)
                 }) {
                     Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showProfileDialog = false }) {
+                TextButton(onClick = { viewModel.toggleProfileDialog(false) }) {
                     Text(stringResource(R.string.cancel))
                 }
             }

@@ -14,9 +14,15 @@ import androidx.compose.ui.unit.dp
 import com.pou.paw.R
 import com.pou.paw.data.model.UserStats
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.pou.paw.ui.viewmodel.HistoryViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(stats: UserStats, onBack: () -> Unit) {
+fun HistoryScreen(viewModel: HistoryViewModel, onBack: () -> Unit) {
+    val uiState by viewModel.uiState.collectAsState()
+    val stats = uiState.stats
     Scaffold(
         topBar = {
             TopAppBar(

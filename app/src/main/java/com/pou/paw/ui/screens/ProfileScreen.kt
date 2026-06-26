@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,14 +23,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pou.paw.R
+import com.pou.paw.ui.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    viewModel: ProfileViewModel,
     onDashboardClick: () -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         bottomBar = {
             ProfileBottomNavBar(
@@ -81,13 +87,13 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = "Ana López",
+                    text = uiState.name,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "ana@email.com",
+                    text = uiState.email,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
@@ -110,17 +116,17 @@ fun ProfileScreen(
                 ) {
                     AccountInfoItem(
                         label = stringResource(R.string.full_name),
-                        value = "Ana López",
+                        value = uiState.name,
                         icon = Icons.Default.Badge
                     )
                     AccountInfoItem(
                         label = stringResource(R.string.email),
-                        value = "ana@email.com",
+                        value = uiState.email,
                         icon = Icons.Default.Email
                     )
                     AccountInfoItem(
                         label = stringResource(R.string.reg_date),
-                        value = "15 de Octubre, 2023",
+                        value = uiState.registrationDate,
                         icon = Icons.Default.CalendarToday
                     )
                     
@@ -157,19 +163,19 @@ fun ProfileScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     title = stringResource(R.string.registered_pets),
-                    value = "3",
+                    value = uiState.petCount.toString(),
                     icon = "🐾",
                     backgroundColor = MaterialTheme.colorScheme.secondaryContainer
                 )
                 StatCard(
                     title = stringResource(R.string.registered_plants),
-                    value = "5",
+                    value = uiState.plantCount.toString(),
                     icon = "🌱",
                     backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
                 StatCard(
                     title = stringResource(R.string.active_reminders),
-                    value = "12",
+                    value = uiState.activeRemindersCount.toString(),
                     icon = "🔔",
                     backgroundColor = Color(0xFFFFE0B2) // Un naranja suave
                 )

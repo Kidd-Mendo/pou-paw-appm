@@ -27,23 +27,17 @@ import com.pou.paw.data.model.Pet
 import com.pou.paw.data.model.Plant
 import com.pou.paw.ui.theme.*
 
+import com.pou.paw.ui.viewmodel.DashboardViewModel
+import com.pou.paw.ui.viewmodel.DashboardUiState
+
 @Composable
 fun DashboardScreen(
+    viewModel: DashboardViewModel,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    val repository = (context.applicationContext as PouPawApplication).repository
-    val reminders by repository.reminders.collectAsState(initial = emptyList())
-    
-    var selectedFilter by remember { mutableStateOf("Todos") }
-    
-    // Mock inicial
-    val initialItems = listOf(
-        Pet(name = "Luna", type = "Gato", breed = "Gato"),
-        Plant(name = "Helecho", type = "Planta", species = "Helecho")
-    )
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         bottomBar = { BottomNavBar(onAddClick, onSettingsClick, onProfileClick) },
@@ -58,43 +52,23 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.height(20.dp))
             HeaderSection(onProfileClick)
             Spacer(modifier = Modifier.height(24.dp))
-            FilterSection(selectedFilter) { selectedFilter = it }
+            FilterSection(uiState.selectedFilter) { viewModel.updateFilter(it) }
             Spacer(modifier = Modifier.height(20.dp))
             
-            val filteredItems = (initialItems + reminders.map { reminder ->
-                if (reminder.category == "Mascota") {
-                    Pet(
-                        id = reminder.id,
-                        name = reminder.targetId,
-                        type = reminder.breedOrType,
-                        breed = reminder.action,
-                        imageUrl = reminder.imageUri
-                    )
-                } else {
-                    Plant(
-                        id = reminder.id,
-                        name = reminder.targetId,
-                        type = reminder.breedOrType,
-                        species = reminder.action,
-                        imageUrl = reminder.imageUri
-                    )
+            if (uiState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
-            }).filter { item ->
-                when (selectedFilter) {
-                    stringResource(R.string.filter_pets) -> item is Pet
-                    stringResource(R.string.filter_plants) -> item is Plant
-                    else -> true
-                }
-            }
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                contentPadding = PaddingValues(bottom = 20.dp)
-            ) {
-                items(filteredItems) { item ->
-                    when (item) {
-                        is Pet -> PetCard(pet = item)
-                        is Plant -> PlantCard(plant = item)
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                    contentPadding = PaddingValues(bottom = 20.dp)
+                ) {
+                    items(uiState.items) { item ->
+                        when (item) {
+                            is Pet -> PetCard(pet = item)
+                            is Plant -> PlantCard(plant = item)
+                        }
                     }
                 }
             }
