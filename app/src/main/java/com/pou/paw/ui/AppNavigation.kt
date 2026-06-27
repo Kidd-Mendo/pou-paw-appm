@@ -8,10 +8,8 @@ import com.pou.paw.ui.screens.DashboardScreen
 import com.pou.paw.ui.screens.AddEntityScreen
 import com.pou.paw.ui.screens.LoginScreen
 import com.pou.paw.ui.screens.SettingsScreen
-
 import com.pou.paw.ui.screens.ProfileScreen
 import com.pou.paw.ui.screens.HistoryScreen
-import com.pou.paw.data.model.UserStats
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,16 +19,21 @@ import com.pou.paw.ui.viewmodel.AddEntityViewModel
 import com.pou.paw.ui.viewmodel.ProfileViewModel
 import com.pou.paw.ui.viewmodel.HistoryViewModel
 import com.pou.paw.ui.viewmodel.SettingsViewModel
+import com.pou.paw.ui.viewmodel.LoginViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-
-import com.pou.paw.ui.viewmodel.LoginViewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val repository = (context.applicationContext as PouPawApplication).repository
+    val app = context.applicationContext as PouPawApplication
+    
+    // Repositorios centralizados desde la Application (SSOT)
+    val reminderRepo = app.reminderRepository
+    val petPlantRepo = app.petPlantRepository
+    val settingsRepo = app.settingsRepository
+    val statsRepo = app.statsRepository
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -44,11 +47,12 @@ fun AppNavigation() {
                 }
             )
         }
+        
         composable("dashboard") {
             val dashboardViewModel: DashboardViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return DashboardViewModel(repository) as T
+                        return DashboardViewModel(reminderRepo, petPlantRepo, settingsRepo, statsRepo) as T
                     }
                 }
             )
@@ -59,11 +63,12 @@ fun AppNavigation() {
                 onProfileClick = { navController.navigate("profile") }
             )
         }
+        
         composable("add") {
             val addEntityViewModel: AddEntityViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return AddEntityViewModel(repository) as T
+                        return AddEntityViewModel(reminderRepo) as T
                     }
                 }
             )
@@ -72,12 +77,12 @@ fun AppNavigation() {
                 onBack = { navController.popBackStack() }
             )
         }
+        
         composable("settings") {
             val settingsViewModel: SettingsViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                        return SettingsViewModel(prefs) as T
+                        return SettingsViewModel(settingsRepo) as T
                     }
                 }
             )
@@ -91,11 +96,12 @@ fun AppNavigation() {
                 }
             )
         }
+        
         composable("profile") {
             val profileViewModel: ProfileViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return ProfileViewModel(repository) as T
+                        return ProfileViewModel(reminderRepo, petPlantRepo, settingsRepo) as T
                     }
                 }
             )
@@ -110,8 +116,15 @@ fun AppNavigation() {
                 onSettingsClick = { navController.navigate("settings") }
             )
         }
+        
         composable("history") {
-            val historyViewModel: HistoryViewModel = viewModel()
+            val historyViewModel: HistoryViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return HistoryViewModel(statsRepo) as T
+                    }
+                }
+            )
             HistoryScreen(
                 viewModel = historyViewModel,
                 onBack = { navController.popBackStack() }

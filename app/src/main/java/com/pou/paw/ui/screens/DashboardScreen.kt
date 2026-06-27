@@ -30,6 +30,8 @@ import com.pou.paw.ui.theme.*
 import com.pou.paw.ui.viewmodel.DashboardViewModel
 import com.pou.paw.ui.viewmodel.DashboardUiState
 
+import androidx.compose.runtime.*
+
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
@@ -50,7 +52,7 @@ fun DashboardScreen(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            HeaderSection(onProfileClick)
+            HeaderSection(uiState.userName, onProfileClick)
             Spacer(modifier = Modifier.height(24.dp))
             FilterSection(uiState.selectedFilter) { viewModel.updateFilter(it) }
             Spacer(modifier = Modifier.height(20.dp))
@@ -66,8 +68,8 @@ fun DashboardScreen(
                 ) {
                     items(uiState.items) { item ->
                         when (item) {
-                            is Pet -> PetCard(pet = item)
-                            is Plant -> PlantCard(plant = item)
+                            is Pet -> PetCard(pet = item, onComplete = { viewModel.completeTask(item) })
+                            is Plant -> PlantCard(plant = item, onComplete = { viewModel.completeTask(item) })
                         }
                     }
                 }
@@ -77,7 +79,7 @@ fun DashboardScreen(
 }
 
 @Composable
-fun HeaderSection(onProfileClick: () -> Unit) {
+fun HeaderSection(userName: String, onProfileClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -115,7 +117,7 @@ fun HeaderSection(onProfileClick: () -> Unit) {
     }
     Spacer(modifier = Modifier.height(16.dp))
     Text(
-        text = stringResource(R.string.welcome_user, "Ana"),
+        text = stringResource(R.string.welcome_user, userName),
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.ExtraBold,
         color = MaterialTheme.colorScheme.onBackground
@@ -169,7 +171,7 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
 }
 
 @Composable
-fun PetCard(pet: Pet) {
+fun PetCard(pet: Pet, onComplete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -212,7 +214,7 @@ fun PetCard(pet: Pet) {
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { },
+                onClick = onComplete,
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
@@ -224,7 +226,7 @@ fun PetCard(pet: Pet) {
 }
 
 @Composable
-fun PlantCard(plant: Plant) {
+fun PlantCard(plant: Plant, onComplete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -264,6 +266,15 @@ fun PlantCard(plant: Plant) {
                 NeedIndicator(stringResource(R.string.need_water), 0.75f, Icons.Default.WaterDrop, ProgressBlue)
                 NeedIndicator(stringResource(R.string.need_light), 0.9f, Icons.Default.WbSunny, ProgressYellow)
                 NeedIndicator(stringResource(R.string.need_nutrient), 0.4f, Icons.Default.Grass, ProgressGreen)
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(
+                onClick = onComplete,
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(25.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+            ) {
+                Text(stringResource(R.string.action_water), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onTertiary)
             }
         }
     }

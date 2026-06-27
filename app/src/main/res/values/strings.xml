@@ -46,6 +46,7 @@
     <string name="filter_pets">Mascotas</string>
     <string name="filter_plants">Plantas</string>
     <string name="action_feed">Alimentar</string>
+    <string name="action_water">Regar</string>
     <string name="status_satisfied">Satisfecho</string>
     <string name="need_food">Comida</string>
     <string name="need_water">Agua</string>

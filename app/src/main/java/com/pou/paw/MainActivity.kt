@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         
         // Al arrancar, forzamos el idioma que esté guardado (por defecto Español)
         val savedLang = prefs.getString("language", "Español") ?: "Español"
-        val langCode = if (savedLang == "English") "en" else "es"
+        val langCode = if (savedLang == "English" || savedLang == "Inglés") "en" else "es"
         
         // Esto le dice a Android que use este idioma ignorando el del sistema si es necesario
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(langCode)
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                         themePref = p.getString("theme", "Claro") ?: "Claro"
                     } else if (key == "language") {
                         val newLang = p.getString("language", "Español") ?: "Español"
-                        val newCode = if (newLang == "English") "en" else "es"
+                        val newCode = if (newLang == "English" || newLang == "Inglés") "en" else "es"
                         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(newCode))
                     }
                 }
