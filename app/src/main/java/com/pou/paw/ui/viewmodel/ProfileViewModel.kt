@@ -1,0 +1,43 @@
+package com.pou.paw.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.pou.paw.data.repository.IPetPlantRepository
+import com.pou.paw.data.repository.IReminderRepository
+import com.pou.paw.data.repository.ISettingsRepository
+import kotlinx.coroutines.flow.*
+
+data class ProfileUiState(
+    val name: String = "",
+    val email: String = "",
+    val registrationDate: String = "1 de Enero, 2024",
+    val petCount: Int = 0,
+    val plantCount: Int = 0,
+    val activeRemindersCount: Int = 0
+)
+
+class ProfileViewModel(
+    private val reminderRepository: IReminderRepository,
+    private val petPlantRepository: IPetPlantRepository,
+    private val settingsRepository: ISettingsRepository
+) : ViewModel() {
+
+    val uiState: StateFlow<ProfileUiState> = combine(
+        settingsRepository.userName,
+        settingsRepository.userEmail,
+        petPlantRepository.petPlants,
+        reminderRepository.reminders
+    ) { name, email, entities, reminders ->
+        ProfileUiState(
+            name = name,
+            email = email,
+            petCount = entities.count { it.type == "Gato" || it.type == "Perro" },
+            plantCount = entities.count { it.type == "Planta" },
+            activeRemindersCount = reminders.size
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ProfileUiState()
+    )
+}

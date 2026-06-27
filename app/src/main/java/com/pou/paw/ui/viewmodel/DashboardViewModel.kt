@@ -1,0 +1,59 @@
+package com.pou.paw.ui.viewmodel
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.pou.paw.data.model.PouEntity
+import com.pou.paw.data.repository.IPetPlantRepository
+import com.pou.paw.data.repository.IReminderRepository
+import com.pou.paw.data.repository.ISettingsRepository
+import com.pou.paw.data.repository.IStatsRepository
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+
+data class DashboardUiState(
+    val userName: String = "Usuario",
+    val selectedFilter: String = "Todos",
+    val items: List<PouEntity> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+class DashboardViewModel(
+    private val reminderRepository: IReminderRepository,
+    private val petPlantRepository: IPetPlantRepository,
+    private val settingsRepository: ISettingsRepository,
+    private val statsRepository: IStatsRepository,
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val _selectedFilter = MutableStateFlow("Todos")
+    
+    val uiState: StateFlow<DashboardUiState> = combine(
+        settingsRepository.userName,
+        _selectedFilter,
+        petPlantRepository.petPlants
+    ) { name, filter, allItems ->
+        DashboardUiState(
+            userName = name,
+            selectedFilter = filter,
+            items = when (filter) {
+                "Mascotas" -> allItems.filter { it.type == "Gato" || it.type == "Perro" }
+                "Plantas" -> allItems.filter { it.type == "Planta" }
+                else -> allItems
+            },
+            isLoading = false
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DashboardUiState(isLoading = true)
+    )
+
+    fun updateFilter(filter: String) {
+        _selectedFilter.value = filter
+    }
+
+    fun completeTask(entity: PouEntity) {
+        // Lógica para completar tarea
+    }
+}
