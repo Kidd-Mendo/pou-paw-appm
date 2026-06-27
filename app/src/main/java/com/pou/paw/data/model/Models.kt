@@ -11,7 +11,9 @@ sealed class PouEntity {
     abstract val imageUrl: String?
 }
 
+@Entity(tableName = "pets")
 data class Pet(
+    @PrimaryKey
     override val id: String = UUID.randomUUID().toString(),
     override val name: String,
     override val type: String, // e.g. "Gato", "Perro"
@@ -24,7 +26,9 @@ data class Pet(
     )
 ) : PouEntity()
 
+@Entity(tableName = "plants")
 data class Plant(
+    @PrimaryKey
     override val id: String = UUID.randomUUID().toString(),
     override val name: String,
     override val type: String, // e.g. "Helecho"

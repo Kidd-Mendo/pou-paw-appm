@@ -12,7 +12,7 @@ class PouPawApplication : Application() {
     }
     
     val petPlantRepository: IPetPlantRepository by lazy {
-        FakePetPlantRepository()
+        PetPlantRepository(database.petDao(), database.plantDao())
     }
     
     val settingsRepository: ISettingsRepository by lazy {
@@ -21,6 +21,7 @@ class PouPawApplication : Application() {
     }
     
     val statsRepository: IStatsRepository by lazy {
-        FakeStatsRepository()
+        val prefs = getSharedPreferences("root_paw_settings", MODE_PRIVATE)
+        StatsRepository(prefs)
     }
 }

@@ -87,7 +87,7 @@ fun AppNavigation() {
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                        return AddEntityViewModel(reminderRepo, extras.createSavedStateHandle()) as T
+                        return AddEntityViewModel(reminderRepo, petPlantRepo, extras.createSavedStateHandle()) as T
                     }
                 }
             )
