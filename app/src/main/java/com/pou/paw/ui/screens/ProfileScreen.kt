@@ -25,16 +25,16 @@ import androidx.compose.ui.unit.sp
 import com.pou.paw.R
 import com.pou.paw.ui.viewmodel.ProfileViewModel
 
+import com.pou.paw.ui.viewmodel.ProfileUiState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel,
+    uiState: ProfileUiState,
     onDashboardClick: () -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     Scaffold(
         bottomBar = {
             ProfileBottomNavBar(

@@ -45,16 +45,28 @@ import com.pou.paw.ui.viewmodel.AddEntityUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
-    
+fun AddEntityScreen(
+    uiState: AddEntityUiState,
+    onNameChange: (String) -> Unit,
+    onBreedChange: (String) -> Unit,
+    onCategoryChange: (String) -> Unit,
+    onImageUriChange: (Uri?) -> Unit,
+    onActionChange: (String) -> Unit,
+    onExpandedActionChange: (Boolean) -> Unit,
+    onFrequencyTypeChange: (String) -> Unit,
+    onFrequencyValueChange: (Float) -> Unit,
+    onDateChange: (LocalDate) -> Unit,
+    onMessageChange: (String) -> Unit,
+    onSaveReminder: () -> Unit,
+    onBack: () -> Unit
+) {
     val nameFocusRequester = remember { FocusRequester() }
     val breedFocusRequester = remember { FocusRequester() }
     
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        viewModel.onImageUriChange(uri)
+        onImageUriChange(uri)
     }
 
     val petActions = listOf("Comida", "Agua", "Pasear", "Limpieza", "Medicina")
@@ -62,13 +74,6 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
 
     val nextDays = remember {
         (0..4).map { LocalDate.now().plusDays(it.toLong()) }
-    }
-
-    // Escuchar el evento de éxito para navegar hacia atrás
-    LaunchedEffect(Unit) {
-        viewModel.saveSuccess.collect {
-            onBack()
-        }
     }
 
     Scaffold(
@@ -150,8 +155,11 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                                 }
                                 BasicTextField(
                                     value = uiState.name,
-                                    onValueChange = { viewModel.onNameChange(it) },
-                                    textStyle = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, color = TextBlack),
+                                    onValueChange = onNameChange,
+                                    textStyle = MaterialTheme.typography.headlineSmall.copy(
+                                        fontWeight = FontWeight.Bold, 
+                                        color = TextBlack
+                                    ),
                                     modifier = Modifier.focusRequester(nameFocusRequester),
                                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                                 )
@@ -174,8 +182,8 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                                 }
                                 BasicTextField(
                                     value = uiState.breedOrType,
-                                    onValueChange = { viewModel.onBreedChange(it) },
-                                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = TextGray),
+                                    onValueChange = onBreedChange,
+                                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = TextBlack),
                                     modifier = Modifier.focusRequester(breedFocusRequester),
                                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                                 )
@@ -202,7 +210,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
-                    onClick = { viewModel.onCategoryChange("Mascota") },
+                    onClick = { onCategoryChange("Mascota") },
                     modifier = Modifier.weight(1f).height(45.dp),
                     shape = RoundedCornerShape(22.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -212,7 +220,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                     Text(stringResource(R.string.category_pet), color = if (uiState.selectedCategory == "Mascota") Color.White else DarkOlive)
                 }
                 Button(
-                    onClick = { viewModel.onCategoryChange("Planta") },
+                    onClick = { onCategoryChange("Planta") },
                     modifier = Modifier.weight(1f).height(45.dp),
                     shape = RoundedCornerShape(22.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -230,7 +238,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             ExposedDropdownMenuBox(
                 expanded = uiState.expandedAction,
-                onExpandedChange = { viewModel.onExpandedActionChange(it) },
+                onExpandedChange = onExpandedActionChange,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -241,13 +249,17 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White
+                        focusedContainerColor = Color.White,
+                        unfocusedTextColor = TextBlack,
+                        focusedTextColor = TextBlack,
+                        unfocusedLabelColor = TextGray,
+                        focusedLabelColor = DarkOlive
                     ),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = uiState.expandedAction) }
                 )
                 ExposedDropdownMenu(
                     expanded = uiState.expandedAction,
-                    onDismissRequest = { viewModel.onExpandedActionChange(false) },
+                    onDismissRequest = { onExpandedActionChange(false) },
                     modifier = Modifier.background(Color.White)
                 ) {
                     val currentActions = if (uiState.selectedCategory == "Mascota") petActions else plantActions
@@ -255,7 +267,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                         DropdownMenuItem(
                             text = { Text(action) },
                             onClick = {
-                                viewModel.onActionChange(action)
+                                onActionChange(action)
                             }
                         )
                     }
@@ -272,7 +284,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
                     FrequencyDayItem(
                         date = date,
                         isSelected = uiState.selectedDate == date,
-                        onClick = { viewModel.onDateChange(date) }
+                        onClick = { onDateChange(date) }
                     )
                 }
             }
@@ -280,14 +292,14 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                FrequencyTypeOption(stringResource(R.string.frequency_daily), uiState.selectedFrequencyType == "Diario") { viewModel.onFrequencyTypeChange("Diario") }
-                FrequencyTypeOption(stringResource(R.string.frequency_hours), uiState.selectedFrequencyType == "Cada X Horas") { viewModel.onFrequencyTypeChange("Cada X Horas") }
-                FrequencyTypeOption(stringResource(R.string.frequency_days), uiState.selectedFrequencyType == "Cada X Días") { viewModel.onFrequencyTypeChange("Cada X Días") }
+                FrequencyTypeOption(stringResource(R.string.frequency_daily), uiState.selectedFrequencyType == "Diario") { onFrequencyTypeChange("Diario") }
+                FrequencyTypeOption(stringResource(R.string.frequency_hours), uiState.selectedFrequencyType == "Cada X Horas") { onFrequencyTypeChange("Cada X Horas") }
+                FrequencyTypeOption(stringResource(R.string.frequency_days), uiState.selectedFrequencyType == "Cada X Días") { onFrequencyTypeChange("Cada X Días") }
             }
             
             Slider(
                 value = uiState.frequencyValue,
-                onValueChange = { viewModel.onFrequencyValueChange(it) },
+                onValueChange = onFrequencyValueChange,
                 valueRange = if (uiState.selectedFrequencyType == "Cada X Días") 1f..30f else 1f..24f,
                 colors = SliderDefaults.colors(
                     thumbColor = Color.White,
@@ -311,13 +323,17 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = uiState.message,
-                onValueChange = { viewModel.onMessageChange(it) },
+                onValueChange = onMessageChange,
                 placeholder = { Text(stringResource(R.string.message_placeholder)) },
                 modifier = Modifier.fillMaxWidth().height(100.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedContainerColor = Color.White.copy(alpha = 0.5f),
-                    focusedContainerColor = Color.White.copy(alpha = 0.5f)
+                    focusedContainerColor = Color.White.copy(alpha = 0.5f),
+                    unfocusedTextColor = TextBlack,
+                    focusedTextColor = TextBlack,
+                    unfocusedPlaceholderColor = TextGray.copy(alpha = 0.6f),
+                    focusedPlaceholderColor = TextGray.copy(alpha = 0.6f)
                 )
             )
 
@@ -325,7 +341,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
 
             // Botones
             Button(
-                onClick = { viewModel.saveReminder() },
+                onClick = onSaveReminder,
                 modifier = Modifier.fillMaxWidth().height(55.dp),
                 shape = RoundedCornerShape(27.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)
@@ -342,6 +358,7 @@ fun AddEntityScreen(viewModel: AddEntityViewModel, onBack: () -> Unit) {
         }
     }
 }
+
 
 @Composable
 fun FrequencyDayItem(date: LocalDate, isSelected: Boolean, onClick: () -> Unit) {

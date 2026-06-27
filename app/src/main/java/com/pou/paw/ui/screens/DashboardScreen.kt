@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,13 +35,13 @@ import androidx.compose.runtime.*
 
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel,
+    uiState: DashboardUiState,
+    onFilterSelected: (String) -> Unit,
+    onCompleteTask: (com.pou.paw.data.model.PouEntity) -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     Scaffold(
         bottomBar = { BottomNavBar(onAddClick, onSettingsClick, onProfileClick) },
         containerColor = MaterialTheme.colorScheme.background
@@ -54,7 +55,7 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.height(20.dp))
             HeaderSection(uiState.userName, onProfileClick)
             Spacer(modifier = Modifier.height(24.dp))
-            FilterSection(uiState.selectedFilter) { viewModel.updateFilter(it) }
+            FilterSection(uiState.selectedFilter) { onFilterSelected(it) }
             Spacer(modifier = Modifier.height(20.dp))
             
             if (uiState.isLoading) {
@@ -62,14 +63,16 @@ fun DashboardScreen(
                     CircularProgressIndicator()
                 }
             } else {
+                val listState = rememberLazyListState()
                 LazyColumn(
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(20.dp),
                     contentPadding = PaddingValues(bottom = 20.dp)
                 ) {
                     items(uiState.items) { item ->
                         when (item) {
-                            is Pet -> PetCard(pet = item, onComplete = { viewModel.completeTask(item) })
-                            is Plant -> PlantCard(plant = item, onComplete = { viewModel.completeTask(item) })
+                            is Pet -> PetCard(pet = item, onComplete = { onCompleteTask(item) })
+                            is Plant -> PlantCard(plant = item, onComplete = { onCompleteTask(item) })
                         }
                     }
                 }

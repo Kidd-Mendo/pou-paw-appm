@@ -22,28 +22,25 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.pou.paw.R
 import com.pou.paw.ui.theme.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-import com.pou.paw.ui.viewmodel.LoginViewModel
+import com.pou.paw.ui.viewmodel.LoginUiState
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
+fun LoginScreen(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onToggleRegister: () -> Unit,
+    onLogin: () -> Unit,
+    onGoogleLogin: () -> Unit,
+    onClearError: () -> Unit
+) {
     val context = LocalContext.current
 
-    // Escuchar el evento de éxito para navegar
-    LaunchedEffect(Unit) {
-        viewModel.loginSuccess.collect {
-            onLoginSuccess()
-        }
-    }
-
-    // Mostrar mensaje de error si existe
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            viewModel.clearError()
+            onClearError()
         }
     }
 
@@ -77,14 +74,19 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = uiState.email,
-            onValueChange = { viewModel.onEmailChange(it) },
-            label = { Text(stringResource(R.string.email_label)) },
+            onValueChange = onEmailChange,
+            label = { Text(stringResource(R.string.email_label), color = TextGray) },
             leadingIcon = { Icon(Icons.Default.Email, null, tint = OliveGreen) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White
+                focusedContainerColor = Color.White,
+                unfocusedTextColor = TextBlack,
+                focusedTextColor = TextBlack,
+                unfocusedLabelColor = TextGray,
+                focusedLabelColor = OliveGreen,
+                cursorColor = OliveGreen
             )
         )
 
@@ -92,15 +94,20 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
 
         OutlinedTextField(
             value = uiState.password,
-            onValueChange = { viewModel.onPasswordChange(it) },
-            label = { Text(stringResource(R.string.password_label)) },
+            onValueChange = onPasswordChange,
+            label = { Text(stringResource(R.string.password_label), color = TextGray) },
             leadingIcon = { Icon(Icons.Default.Lock, null, tint = OliveGreen) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedContainerColor = Color.White,
-                focusedContainerColor = Color.White
+                focusedContainerColor = Color.White,
+                unfocusedTextColor = TextBlack,
+                focusedTextColor = TextBlack,
+                unfocusedLabelColor = TextGray,
+                focusedLabelColor = OliveGreen,
+                cursorColor = OliveGreen
             )
         )
 
@@ -110,32 +117,47 @@ fun LoginScreen(viewModel: LoginViewModel, onLoginSuccess: () -> Unit) {
             CircularProgressIndicator(color = OliveGreen)
         } else {
             Button(
-                onClick = { viewModel.login() },
+                onClick = onLogin,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = OliveGreen)
             ) {
-                Text(if (uiState.isRegistering) stringResource(R.string.register_button) else stringResource(R.string.login_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(
+                    text = if (uiState.isRegistering) stringResource(R.string.register_button) else stringResource(R.string.login_button), 
+                    fontWeight = FontWeight.Bold, 
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             if (!uiState.isRegistering) {
                 OutlinedButton(
-                    onClick = { viewModel.loginWithGoogle() },
+                    onClick = onGoogleLogin,
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(28.dp),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(DarkOlive)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = DarkOlive)
                 ) {
-                    Icon(imageVector = Icons.Default.AccountCircle, contentDescription = null, modifier = Modifier.size(24.dp))
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(24.dp),
+                        tint = DarkOlive
+                    )
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.google_login), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.google_login),
+                        fontWeight = FontWeight.Bold,
+                        color = DarkOlive
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextButton(onClick = { viewModel.toggleRegistering() }) {
+            TextButton(onClick = onToggleRegister) {
                 Text(
                     text = if (uiState.isRegistering) stringResource(R.string.has_account) else stringResource(R.string.no_account),
                     color = DarkOlive,

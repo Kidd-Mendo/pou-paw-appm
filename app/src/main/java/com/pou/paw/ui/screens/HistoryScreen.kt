@@ -3,6 +3,7 @@ package com.pou.paw.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -18,10 +19,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.pou.paw.ui.viewmodel.HistoryViewModel
 
+import com.pou.paw.ui.viewmodel.HistoryUiState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(viewModel: HistoryViewModel, onBack: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsState()
+fun HistoryScreen(uiState: HistoryUiState, onBack: () -> Unit) {
     val stats = uiState.stats
     Scaffold(
         topBar = {
@@ -58,7 +60,8 @@ fun HistoryScreen(viewModel: HistoryViewModel, onBack: () -> Unit) {
                 text = stringResource(R.string.achievements_title),
                 style = MaterialTheme.typography.titleMedium
             )
-            LazyColumn {
+            val listState = rememberLazyListState()
+            LazyColumn(state = listState) {
                 items(stats.achievements) { achievement ->
                     ListItem(
                         headlineContent = { Text(achievement) },

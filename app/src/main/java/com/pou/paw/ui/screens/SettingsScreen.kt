@@ -21,15 +21,22 @@ import com.pou.paw.R
 
 import com.pou.paw.ui.viewmodel.SettingsViewModel
 
+import com.pou.paw.ui.viewmodel.SettingsUiState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel,
+    uiState: SettingsUiState,
     onBackClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onToggleProfileDialog: (Boolean) -> Unit,
+    onToggleThemeDialog: (Boolean) -> Unit,
+    onToggleLanguageDialog: (Boolean) -> Unit,
+    onToggleAboutDialog: (Boolean) -> Unit,
+    onSetTheme: (String) -> Unit,
+    onSetLanguage: (String) -> Unit,
+    onUpdateProfile: (String, String) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,7 +62,7 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Person,
                     title = stringResource(R.string.edit_profile),
-                    onClick = { viewModel.toggleProfileDialog(true) }
+                    onClick = { onToggleProfileDialog(true) }
                 )
                 SettingsItem(
                     icon = Icons.Default.Lock,
@@ -87,13 +94,13 @@ fun SettingsScreen(
                     icon = Icons.Default.Palette,
                     title = stringResource(R.string.theme),
                     subtitle = uiState.currentTheme,
-                    onClick = { viewModel.toggleThemeDialog(true) }
+                    onClick = { onToggleThemeDialog(true) }
                 )
                 SettingsItem(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.language),
                     subtitle = uiState.currentLanguage,
-                    onClick = { viewModel.toggleLanguageDialog(true) }
+                    onClick = { onToggleLanguageDialog(true) }
                 )
             }
 
@@ -106,7 +113,7 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Info,
                     title = stringResource(R.string.about),
-                    onClick = { viewModel.toggleAboutDialog(true) }
+                    onClick = { onToggleAboutDialog(true) }
                 )
             }
 
@@ -143,9 +150,9 @@ fun SettingsScreen(
             options = themes,
             selectedOption = uiState.currentTheme,
             onOptionSelected = {
-                viewModel.setTheme(it)
+                onSetTheme(it)
             },
-            onDismissRequest = { viewModel.toggleThemeDialog(false) }
+            onDismissRequest = { onToggleThemeDialog(false) }
         )
     }
 
@@ -159,19 +166,19 @@ fun SettingsScreen(
             options = languages,
             selectedOption = uiState.currentLanguage,
             onOptionSelected = {
-                viewModel.setLanguage(it)
+                onSetLanguage(it)
             },
-            onDismissRequest = { viewModel.toggleLanguageDialog(false) }
+            onDismissRequest = { onToggleLanguageDialog(false) }
         )
     }
 
     if (uiState.showAboutDialog) {
         AlertDialog(
-            onDismissRequest = { viewModel.toggleAboutDialog(false) },
+            onDismissRequest = { onToggleAboutDialog(false) },
             title = { Text(stringResource(R.string.about_title)) },
             text = { Text(stringResource(R.string.about_description)) },
             confirmButton = {
-                TextButton(onClick = { viewModel.toggleAboutDialog(false) }) {
+                TextButton(onClick = { onToggleAboutDialog(false) }) {
                     Text(stringResource(R.string.close))
                 }
             }
@@ -183,7 +190,7 @@ fun SettingsScreen(
         var email by remember { mutableStateOf(uiState.userEmail) }
         
         AlertDialog(
-            onDismissRequest = { viewModel.toggleProfileDialog(false) },
+            onDismissRequest = { onToggleProfileDialog(false) },
             title = { Text(stringResource(R.string.dialog_edit_profile)) },
             text = {
                 Column {
@@ -202,19 +209,20 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.updateProfile(name, email)
+                    onUpdateProfile(name, email)
                 }) {
                     Text(stringResource(R.string.save))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.toggleProfileDialog(false) }) {
+                TextButton(onClick = { onToggleProfileDialog(false) }) {
                     Text(stringResource(R.string.cancel))
                 }
             }
         )
     }
 }
+
 
 @Composable
 fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
