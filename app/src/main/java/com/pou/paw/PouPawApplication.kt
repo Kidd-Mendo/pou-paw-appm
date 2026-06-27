@@ -7,7 +7,7 @@ import com.pou.paw.data.repository.*
 class PouPawApplication : Application() {
     private val database by lazy { AppDatabase.getDatabase(this) }
     
-    val reminderRepository: IReminderRepository by lazy { 
+    val reminderRepository: IReminderRepository by lazy {
         ReminderRepository(database.reminderDao()) 
     }
     

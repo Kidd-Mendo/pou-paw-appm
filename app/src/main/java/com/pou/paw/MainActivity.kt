@@ -16,11 +16,9 @@ class MainActivity : AppCompatActivity() {
         
         val prefs = getSharedPreferences("root_paw_settings", Context.MODE_PRIVATE)
         
-        // Al arrancar, forzamos el idioma que esté guardado (por defecto Español)
-        val savedLang = prefs.getString("language", "Español") ?: "Español"
-        val langCode = if (savedLang == "English" || savedLang == "Inglés") "en" else "es"
+        // Al arrancar, forzamos el idioma que esté guardado (por defecto Español "es")
+        val langCode = prefs.getString("language", "es") ?: "es"
         
-        // Esto le dice a Android que use este idioma ignorando el del sistema si es necesario
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(langCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
 
@@ -35,8 +33,7 @@ class MainActivity : AppCompatActivity() {
                     if (key == "theme") {
                         themePref = p.getString("theme", "Claro") ?: "Claro"
                     } else if (key == "language") {
-                        val newLang = p.getString("language", "Español") ?: "Español"
-                        val newCode = if (newLang == "English" || newLang == "Inglés") "en" else "es"
+                        val newCode = p.getString("language", "es") ?: "es"
                         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(newCode))
                     }
                 }
