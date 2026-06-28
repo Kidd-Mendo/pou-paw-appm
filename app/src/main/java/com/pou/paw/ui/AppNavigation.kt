@@ -3,41 +3,21 @@ package com.pou.paw.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.createSavedStateHandle
-import androidx.lifecycle.viewmodel.CreationExtras
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pou.paw.PouPawApplication
 import com.pou.paw.ui.screens.*
 import com.pou.paw.ui.viewmodel.*
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val context = LocalContext.current
-    val app = context.applicationContext as PouPawApplication
-    
-    val reminderRepo = app.reminderRepository
-    val petPlantRepo = app.petPlantRepository
-    val settingsRepo = app.settingsRepository
-    val statsRepo = app.statsRepository
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            val loginViewModel: LoginViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                        return LoginViewModel(extras.createSavedStateHandle()) as T
-                    }
-                }
-            )
+            val loginViewModel: LoginViewModel = hiltViewModel()
             val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
@@ -60,18 +40,7 @@ fun AppNavigation() {
         }
         
         composable("dashboard") {
-            val dashboardViewModel: DashboardViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                        return DashboardViewModel(
-                            reminderRepo, petPlantRepo, settingsRepo, statsRepo,
-                            app.filterEntitiesUseCase,
-                            extras.createSavedStateHandle()
-                        ) as T
-                    }
-                }
-            )
+            val dashboardViewModel: DashboardViewModel = hiltViewModel()
             val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
             DashboardScreen(
                 uiState = uiState,
@@ -84,14 +53,7 @@ fun AppNavigation() {
         }
 
         composable("add") {
-            val addEntityViewModel: AddEntityViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                        return AddEntityViewModel(app.saveReminderUseCase, extras.createSavedStateHandle()) as T
-                    }
-                }
-            )
+            val addEntityViewModel: AddEntityViewModel = hiltViewModel()
             val uiState by addEntityViewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
@@ -118,14 +80,7 @@ fun AppNavigation() {
         }
 
         composable("settings") {
-            val settingsViewModel: SettingsViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return SettingsViewModel(settingsRepo) as T
-                    }
-                }
-            )
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
             val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
             SettingsScreen(
                 uiState = uiState,
@@ -146,19 +101,7 @@ fun AppNavigation() {
         }
 
         composable("profile") {
-            val profileViewModel: ProfileViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return ProfileViewModel(
-                            reminderRepo, 
-                            petPlantRepo, 
-                            settingsRepo,
-                            app.getEntityCountsUseCase
-                        ) as T
-                    }
-                }
-            )
+            val profileViewModel: ProfileViewModel = hiltViewModel()
             val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
             ProfileScreen(
                 uiState = uiState,
@@ -173,14 +116,7 @@ fun AppNavigation() {
         }
 
         composable("history") {
-            val historyViewModel: HistoryViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return HistoryViewModel(statsRepo) as T
-                    }
-                }
-            )
+            val historyViewModel: HistoryViewModel = hiltViewModel()
             val uiState by historyViewModel.uiState.collectAsStateWithLifecycle()
             HistoryScreen(
                 uiState = uiState,

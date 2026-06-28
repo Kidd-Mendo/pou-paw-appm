@@ -6,7 +6,9 @@ import com.pou.paw.data.repository.IPetPlantRepository
 import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.data.repository.ISettingsRepository
 import com.pou.paw.domain.usecase.GetEntityCountsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 data class ProfileUiState(
     val name: String = "",
@@ -17,7 +19,8 @@ data class ProfileUiState(
     val activeRemindersCount: Int = 0
 )
 
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     private val reminderRepository: IReminderRepository,
     private val petPlantRepository: IPetPlantRepository,
     private val settingsRepository: ISettingsRepository,

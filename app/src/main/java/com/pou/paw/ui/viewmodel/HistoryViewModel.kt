@@ -4,14 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pou.paw.data.model.UserStats
 import com.pou.paw.data.repository.IStatsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 data class HistoryUiState(
     val stats: UserStats = UserStats(),
     val isLoading: Boolean = false
 )
 
-class HistoryViewModel(
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
     private val statsRepository: IStatsRepository
 ) : ViewModel() {
 

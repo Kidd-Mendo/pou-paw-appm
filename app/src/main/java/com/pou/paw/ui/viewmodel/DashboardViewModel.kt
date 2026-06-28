@@ -8,8 +8,11 @@ import com.pou.paw.data.repository.IPetPlantRepository
 import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.data.repository.ISettingsRepository
 import com.pou.paw.data.repository.IStatsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import com.pou.paw.domain.usecase.FilterEntitiesUseCase
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class DashboardUiState(
     val userName: String = "Usuario",
@@ -18,7 +21,8 @@ data class DashboardUiState(
     val isLoading: Boolean = false
 )
 
-class DashboardViewModel(
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
     private val reminderRepository: IReminderRepository,
     private val petPlantRepository: IPetPlantRepository,
     private val settingsRepository: ISettingsRepository,

@@ -3,8 +3,10 @@ package com.pou.paw.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pou.paw.data.repository.ISettingsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class SettingsUiState(
     val currentTheme: String = "Claro",
@@ -17,7 +19,8 @@ data class SettingsUiState(
     val showProfileDialog: Boolean = false
 )
 
-class SettingsViewModel(
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
     private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
