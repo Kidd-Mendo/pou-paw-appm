@@ -3,6 +3,7 @@ package com.pou.paw
 import android.app.Application
 import com.pou.paw.data.local.AppDatabase
 import com.pou.paw.data.repository.*
+import com.pou.paw.domain.usecase.*
 
 class PouPawApplication : Application() {
     private val database by lazy { AppDatabase.getDatabase(this) }
@@ -24,4 +25,9 @@ class PouPawApplication : Application() {
         val prefs = getSharedPreferences("root_paw_settings", MODE_PRIVATE)
         StatsRepository(prefs)
     }
+
+    // Use Cases
+    val filterEntitiesUseCase by lazy { FilterEntitiesUseCase() }
+    val getEntityCountsUseCase by lazy { GetEntityCountsUseCase() }
+    val saveReminderUseCase by lazy { SaveReminderUseCase(reminderRepository, petPlantRepository) }
 }

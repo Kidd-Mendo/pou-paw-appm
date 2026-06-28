@@ -66,6 +66,7 @@ fun AppNavigation() {
                     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                         return DashboardViewModel(
                             reminderRepo, petPlantRepo, settingsRepo, statsRepo,
+                            app.filterEntitiesUseCase,
                             extras.createSavedStateHandle()
                         ) as T
                     }
@@ -87,7 +88,7 @@ fun AppNavigation() {
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-                        return AddEntityViewModel(reminderRepo, petPlantRepo, extras.createSavedStateHandle()) as T
+                        return AddEntityViewModel(app.saveReminderUseCase, extras.createSavedStateHandle()) as T
                     }
                 }
             )
@@ -149,7 +150,12 @@ fun AppNavigation() {
                 factory = object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return ProfileViewModel(reminderRepo, petPlantRepo, settingsRepo) as T
+                        return ProfileViewModel(
+                            reminderRepo, 
+                            petPlantRepo, 
+                            settingsRepo,
+                            app.getEntityCountsUseCase
+                        ) as T
                     }
                 }
             )

@@ -4,16 +4,10 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pou.paw.data.model.Pet
-import com.pou.paw.data.model.Plant
-import com.pou.paw.data.model.Reminder
-import com.pou.paw.data.repository.IPetPlantRepository
-import com.pou.paw.data.repository.IReminderRepository
+import com.pou.paw.domain.usecase.SaveReminderUseCase
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneOffset
-import java.util.UUID
 
 data class AddEntityUiState(
     val name: String = "",
@@ -29,8 +23,7 @@ data class AddEntityUiState(
 )
 
 class AddEntityViewModel(
-    private val reminderRepository: IReminderRepository,
-    private val petPlantRepository: IPetPlantRepository,
+    private val saveReminderUseCase: SaveReminderUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -88,39 +81,17 @@ class AddEntityViewModel(
     fun saveReminder() {
         viewModelScope.launch {
             val state = _uiState.value
-            
-            // 1. Guardar la Entidad (Mascota o Planta)
-            if (state.selectedCategory == "Mascota") {
-                val newPet = Pet(
-                    name = state.name,
-                    type = "Mascota",
-                    breed = state.breedOrType,
-                    imageUrl = state.imageUri?.toString()
-                )
-                petPlantRepository.addPet(newPet)
-            } else {
-                val newPlant = Plant(
-                    name = state.name,
-                    type = "Planta",
-                    species = state.breedOrType,
-                    imageUrl = state.imageUri?.toString()
-                )
-                petPlantRepository.addPlant(newPlant)
-            }
-
-            // 2. Guardar el Recordatorio
-            val reminder = Reminder(
-                id = UUID.randomUUID().toString(),
-                targetId = state.name,
+            saveReminderUseCase(
+                name = state.name,
                 category = state.selectedCategory,
                 breedOrType = state.breedOrType,
+                imageUri = state.imageUri?.toString(),
                 action = state.selectedAction,
-                frequency = "${state.selectedFrequencyType} ${state.frequencyValue.toInt()}",
-                message = state.message,
-                nextOccurrence = state.selectedDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-                imageUri = state.imageUri?.toString()
+                frequencyType = state.selectedFrequencyType,
+                frequencyValue = state.frequencyValue.toInt(),
+                date = state.selectedDate,
+                message = state.message
             )
-            reminderRepository.addReminder(reminder)
             _saveSuccess.emit(Unit)
         }
     }

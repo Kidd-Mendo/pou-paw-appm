@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.pou.paw.data.repository.IPetPlantRepository
 import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.data.repository.ISettingsRepository
+import com.pou.paw.domain.usecase.GetEntityCountsUseCase
 import kotlinx.coroutines.flow.*
 
 data class ProfileUiState(
@@ -19,7 +20,8 @@ data class ProfileUiState(
 class ProfileViewModel(
     private val reminderRepository: IReminderRepository,
     private val petPlantRepository: IPetPlantRepository,
-    private val settingsRepository: ISettingsRepository
+    private val settingsRepository: ISettingsRepository,
+    private val getEntityCountsUseCase: GetEntityCountsUseCase
 ) : ViewModel() {
 
     val uiState: StateFlow<ProfileUiState> = combine(
@@ -28,11 +30,12 @@ class ProfileViewModel(
         petPlantRepository.petPlants,
         reminderRepository.reminders
     ) { name, email, entities, reminders ->
+        val (pets, plants) = getEntityCountsUseCase(entities)
         ProfileUiState(
             name = name,
             email = email,
-            petCount = entities.count { it.type == "Gato" || it.type == "Perro" },
-            plantCount = entities.count { it.type == "Planta" },
+            petCount = pets,
+            plantCount = plants,
             activeRemindersCount = reminders.size
         )
     }.stateIn(

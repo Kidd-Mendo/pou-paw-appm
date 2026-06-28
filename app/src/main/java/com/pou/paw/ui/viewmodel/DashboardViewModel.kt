@@ -8,8 +8,8 @@ import com.pou.paw.data.repository.IPetPlantRepository
 import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.data.repository.ISettingsRepository
 import com.pou.paw.data.repository.IStatsRepository
+import com.pou.paw.domain.usecase.FilterEntitiesUseCase
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 data class DashboardUiState(
     val userName: String = "Usuario",
@@ -23,6 +23,7 @@ class DashboardViewModel(
     private val petPlantRepository: IPetPlantRepository,
     private val settingsRepository: ISettingsRepository,
     private val statsRepository: IStatsRepository,
+    private val filterEntitiesUseCase: FilterEntitiesUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -36,11 +37,7 @@ class DashboardViewModel(
         DashboardUiState(
             userName = name,
             selectedFilter = filter,
-            items = when (filter) {
-                "Mascotas" -> allItems.filter { it.type == "Gato" || it.type == "Perro" }
-                "Plantas" -> allItems.filter { it.type == "Planta" }
-                else -> allItems
-            },
+            items = filterEntitiesUseCase(allItems, filter),
             isLoading = false
         )
     }.stateIn(
