@@ -9,7 +9,9 @@ import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
 import com.pou.paw.ui.AppNavigation
 import com.pou.paw.ui.theme.PouPawTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
