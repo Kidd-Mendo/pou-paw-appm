@@ -4,7 +4,9 @@ import com.pou.paw.data.model.PouEntity
 import com.pou.paw.data.model.Pet
 import com.pou.paw.data.model.Plant
 
-class GetEntityCountsUseCase {
+import javax.inject.Inject
+
+class GetEntityCountsUseCase @Inject constructor() {
     operator fun invoke(entities: List<PouEntity>): Pair<Int, Int> {
         val pets = entities.count { it is Pet || it.type == "Gato" || it.type == "Perro" }
         val plants = entities.count { it is Plant || it.type == "Planta" }

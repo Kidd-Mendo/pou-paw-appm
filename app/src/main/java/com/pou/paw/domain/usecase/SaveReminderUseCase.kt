@@ -9,7 +9,9 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.UUID
 
-class SaveReminderUseCase(
+import javax.inject.Inject
+
+class SaveReminderUseCase @Inject constructor(
     private val reminderRepository: IReminderRepository,
     private val petPlantRepository: IPetPlantRepository
 ) {
