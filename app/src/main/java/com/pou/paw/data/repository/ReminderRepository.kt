@@ -4,7 +4,9 @@ import com.pou.paw.data.local.ReminderDao
 import com.pou.paw.data.model.Reminder
 import kotlinx.coroutines.flow.Flow
 
-class ReminderRepository(private val reminderDao: ReminderDao) : IReminderRepository {
+import javax.inject.Inject
+
+class ReminderRepository @Inject constructor(private val reminderDao: ReminderDao) : IReminderRepository {
     override val reminders: Flow<List<Reminder>> = reminderDao.getAllReminders()
 
     override suspend fun addReminder(reminder: Reminder) {

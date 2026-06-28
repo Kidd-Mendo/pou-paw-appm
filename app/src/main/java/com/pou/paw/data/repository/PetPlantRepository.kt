@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.withContext
 
-class PetPlantRepository(
+import javax.inject.Inject
+
+class PetPlantRepository @Inject constructor(
     private val petDao: PetDao,
     private val plantDao: PlantDao
 ) : IPetPlantRepository {

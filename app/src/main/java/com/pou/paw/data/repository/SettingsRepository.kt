@@ -1,11 +1,12 @@
 package com.pou.paw.data.repository
 
 import android.content.SharedPreferences
+import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SettingsRepository(private val prefs: SharedPreferences) : ISettingsRepository {
+class SettingsRepository @Inject constructor(private val prefs: SharedPreferences) : ISettingsRepository {
     private val _theme = MutableStateFlow(prefs.getString("theme", "Claro") ?: "Claro")
     override val theme: Flow<String> = _theme.asStateFlow()
 
