@@ -1,9 +1,8 @@
 package com.pou.paw
 
-import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
@@ -16,11 +15,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        val prefs = getSharedPreferences("root_paw_settings", Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences("root_paw_settings", MODE_PRIVATE)
         
-        // Al arrancar, forzamos el idioma que esté guardado (por defecto Español "es")
+        // Idioma inicial
         val langCode = prefs.getString("language", "es") ?: "es"
-        
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(langCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
 
@@ -29,7 +27,6 @@ class MainActivity : AppCompatActivity() {
                 mutableStateOf(prefs.getString("theme", "Claro") ?: "Claro") 
             }
 
-            // Escuchar cambios en SharedPreferences en tiempo real
             val listener = remember {
                 android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
                     if (key == "theme") {
