@@ -57,6 +57,7 @@ fun AddEntityScreen(
     onFrequencyValueChange: (Float) -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onMessageChange: (String) -> Unit,
+    onFetchRandomImage: () -> Unit,
     onSaveReminder: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -122,9 +123,10 @@ fun AddEntityScreen(
                             .clickable { launcher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (uiState.imageUri != null) {
+                        val displayImage = uiState.imageUri ?: uiState.networkImageUrl
+                        if (displayImage != null) {
                             AsyncImage(
-                                model = uiState.imageUri,
+                                model = displayImage,
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
@@ -138,6 +140,12 @@ fun AddEntityScreen(
                                     modifier = Modifier.size(40.dp)
                                 )
                                 Text(stringResource(R.string.add_photo), fontSize = 11.sp, color = OliveGreen, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        
+                        if (uiState.isLoadingNetwork) {
+                            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                             }
                         }
                     }
@@ -199,6 +207,25 @@ fun AddEntityScreen(
                             tint = OliveGreen,
                             modifier = Modifier.padding(top = 8.dp).size(32.dp)
                         )
+                        
+                        if (uiState.selectedCategory == "Mascota") {
+                            TextButton(
+                                onClick = onFetchRandomImage,
+                                modifier = Modifier.padding(top = 4.dp),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.CloudDownload, null, modifier = Modifier.size(16.dp), tint = OliveGreen)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        stringResource(R.string.get_network_image),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = OliveGreen
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

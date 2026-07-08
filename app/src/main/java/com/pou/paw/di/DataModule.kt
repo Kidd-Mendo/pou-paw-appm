@@ -34,6 +34,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindStatsRepository(repo: StatsRepository): IStatsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPetBreedRepository(repo: PetBreedRepository): IPetBreedRepository
 }
 
 @Module

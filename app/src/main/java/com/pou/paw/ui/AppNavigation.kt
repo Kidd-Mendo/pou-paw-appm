@@ -74,6 +74,7 @@ fun AppNavigation() {
                 onFrequencyValueChange = addEntityViewModel::onFrequencyValueChange,
                 onDateChange = addEntityViewModel::onDateChange,
                 onMessageChange = addEntityViewModel::onMessageChange,
+                onFetchRandomImage = addEntityViewModel::fetchRandomImage,
                 onSaveReminder = addEntityViewModel::saveReminder,
                 onBack = { navController.popBackStack() }
             )

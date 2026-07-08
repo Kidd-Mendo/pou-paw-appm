@@ -95,4 +95,6 @@
     <string name="theme_system">Sistema</string>
     <string name="lang_es">Español</string>
     <string name="lang_en">English</string>
+    <string name="get_network_image">Obtener foto de red</string>
+    <string name="fetching_image">Obteniendo imagen...</string>
 </resources>
