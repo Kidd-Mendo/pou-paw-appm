@@ -17,27 +17,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.pou.paw.R
-import com.pou.paw.PouPawApplication
-import com.pou.paw.data.model.Pet
-import com.pou.paw.data.model.Plant
+import com.pou.paw.data.model.PetEntity
+import com.pou.paw.data.model.PlantEntity
+import com.pou.paw.data.model.PouEntity
 import com.pou.paw.ui.theme.*
-
-import com.pou.paw.ui.viewmodel.DashboardViewModel
 import com.pou.paw.ui.viewmodel.DashboardUiState
-
-import androidx.compose.runtime.*
 
 @Composable
 fun DashboardScreen(
     uiState: DashboardUiState,
     onFilterSelected: (String) -> Unit,
-    onCompleteTask: (com.pou.paw.data.model.PouEntity) -> Unit,
+    onCompleteTask: (PouEntity) -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProfileClick: () -> Unit
@@ -71,8 +66,8 @@ fun DashboardScreen(
                 ) {
                     items(uiState.items) { item ->
                         when (item) {
-                            is Pet -> PetCard(pet = item, onComplete = { onCompleteTask(item) })
-                            is Plant -> PlantCard(plant = item, onComplete = { onCompleteTask(item) })
+                            is PetEntity -> PetCard(pet = item, onComplete = { onCompleteTask(item) })
+                            is PlantEntity -> PlantCard(plant = item, onComplete = { onCompleteTask(item) })
                         }
                     }
                 }
@@ -174,7 +169,7 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
 }
 
 @Composable
-fun PetCard(pet: Pet, onComplete: () -> Unit) {
+fun PetCard(pet: PetEntity, onComplete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -229,7 +224,7 @@ fun PetCard(pet: Pet, onComplete: () -> Unit) {
 }
 
 @Composable
-fun PlantCard(plant: Plant, onComplete: () -> Unit) {
+fun PlantCard(plant: PlantEntity, onComplete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

@@ -111,7 +111,8 @@ fun AppNavigation() {
                     }
                 },
                 onAddClick = { navController.navigate("add") },
-                onSettingsClick = { navController.navigate("settings") }
+                onSettingsClick = { navController.navigate("settings") },
+                onHistoryClick = { navController.navigate("history") }
             )
         }
 

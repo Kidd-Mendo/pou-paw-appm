@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.pou.paw.PouPawApplication
 import com.pou.paw.R
-import com.pou.paw.data.model.Reminder
+import com.pou.paw.data.model.ReminderEntity
 import com.pou.paw.ui.theme.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate

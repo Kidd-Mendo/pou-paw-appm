@@ -2,58 +2,50 @@ package com.pou.paw.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
 
-sealed class PouEntity {
-    abstract val id: String
-    abstract val name: String
-    abstract val type: String
-    abstract val imageUrl: String?
+// Interfaz común para que el filtro y las listas funcionen con ambos tipos
+interface PouEntity {
+    val id: Long
+    val name: String
+    val type: String
+    val imageUrl: String?
 }
-
-@Entity(tableName = "pets")
-data class Pet(
-    @PrimaryKey
-    override val id: String = UUID.randomUUID().toString(),
-    override val name: String,
-    override val type: String, // e.g. "Gato", "Perro"
-    val breed: String,
-    override val imageUrl: String? = null,
-    val needs: List<Need> = listOf(
-        Need("Comida", 0.5f),
-        Need("Agua", 0.7f),
-        Need("Limpieza", 0.3f)
-    )
-) : PouEntity()
-
-@Entity(tableName = "plants")
-data class Plant(
-    @PrimaryKey
-    override val id: String = UUID.randomUUID().toString(),
-    override val name: String,
-    override val type: String, // e.g. "Helecho"
-    val species: String,
-    override val imageUrl: String? = null,
-    val isToxicForPets: Boolean = false,
-    val needs: List<Need> = listOf(
-        Need("Agua", 0.75f),
-        Need("Luz", 0.9f),
-        Need("Nutriente", 0.4f)
-    )
-) : PouEntity()
 
 data class Need(
     val name: String,
-    val level: Float // 0.0 to 1.0
+    val level: Float
 )
 
+@Entity(tableName = "pets")
+data class PetEntity(
+    @PrimaryKey(autoGenerate = true)
+    override val id: Long = 0,
+    override val name: String,
+    override val type: String,
+    val breed: String,
+    val age: String,
+    override val imageUrl: String? = null,
+    val needs: List<Need> = emptyList()
+) : PouEntity
+
+@Entity(tableName = "plants")
+data class PlantEntity(
+    @PrimaryKey(autoGenerate = true)
+    override val id: Long = 0,
+    override val name: String,
+    override val type: String, // "Planta"
+    val species: String,
+    val wateringFrequency: String,
+    override val imageUrl: String? = null,
+    val needs: List<Need> = emptyList()
+) : PouEntity
+
 @Entity(tableName = "reminders")
-data class Reminder(
-    @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val targetId: String, // Pet or Plant Name
-    val category: String, // "Mascota" or "Planta"
-    val breedOrType: String,
+data class ReminderEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val targetId: Long,
+    val category: String,
     val action: String,
     val frequency: String,
     val message: String,

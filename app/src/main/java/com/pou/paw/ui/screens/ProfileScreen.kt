@@ -33,7 +33,8 @@ fun ProfileScreen(
     uiState: ProfileUiState,
     onDashboardClick: () -> Unit,
     onAddClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onHistoryClick: () -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -179,6 +180,19 @@ fun ProfileScreen(
                     icon = "🔔",
                     backgroundColor = Color(0xFFFFE0B2) // Un naranja suave
                 )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Button(
+                    onClick = onHistoryClick,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Icon(Icons.Default.BarChart, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.history_title), fontWeight = FontWeight.Bold)
+                }
             }
             
             Spacer(modifier = Modifier.height(32.dp))

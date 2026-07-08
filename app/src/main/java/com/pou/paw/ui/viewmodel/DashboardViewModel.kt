@@ -1,15 +1,13 @@
 package com.pou.paw.ui.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pou.paw.data.model.PouEntity
 import com.pou.paw.data.repository.IPetPlantRepository
-import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.data.repository.ISettingsRepository
 import com.pou.paw.data.repository.IStatsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.pou.paw.domain.usecase.FilterEntitiesUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,20 +21,21 @@ data class DashboardUiState(
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val reminderRepository: IReminderRepository,
     private val petPlantRepository: IPetPlantRepository,
     private val settingsRepository: ISettingsRepository,
     private val statsRepository: IStatsRepository,
-    private val filterEntitiesUseCase: FilterEntitiesUseCase,
-    private val savedStateHandle: SavedStateHandle
+    private val filterEntitiesUseCase: FilterEntitiesUseCase
 ) : ViewModel() {
 
     private val _selectedFilter = MutableStateFlow("Todos")
     
+    // Combinamos mascotas y plantas para mostrar en el Dashboard
+    private val allEntities = petPlantRepository.petPlants
+
     val uiState: StateFlow<DashboardUiState> = combine(
         settingsRepository.userName,
         _selectedFilter,
-        petPlantRepository.petPlants
+        allEntities
     ) { name, filter, allItems ->
         DashboardUiState(
             userName = name,
@@ -55,6 +54,8 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun completeTask(entity: PouEntity) {
-        // Lógica para completar tarea
+        viewModelScope.launch {
+            statsRepository.incrementTasks()
+        }
     }
 }

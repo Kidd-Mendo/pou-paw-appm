@@ -1,14 +1,12 @@
 package com.pou.paw.domain.usecase
 
-import com.pou.paw.data.model.Pet
-import com.pou.paw.data.model.Plant
-import com.pou.paw.data.model.Reminder
+import com.pou.paw.data.model.PetEntity
+import com.pou.paw.data.model.PlantEntity
+import com.pou.paw.data.model.ReminderEntity
 import com.pou.paw.data.repository.IPetPlantRepository
 import com.pou.paw.data.repository.IReminderRepository
 import java.time.LocalDate
 import java.time.ZoneOffset
-import java.util.UUID
-
 import javax.inject.Inject
 
 class SaveReminderUseCase @Inject constructor(
@@ -26,31 +24,31 @@ class SaveReminderUseCase @Inject constructor(
         date: LocalDate,
         message: String
     ) {
-        // 1. Guardar la Entidad (Mascota o Planta)
-        if (category == "Mascota") {
-            val newPet = Pet(
+        // 1. Guardar la Entidad (Mascota o Planta) y obtener su ID generado
+        val generatedId = if (category == "Mascota") {
+            val newPet = PetEntity(
                 name = name,
                 type = "Mascota",
                 breed = breedOrType,
+                age = "0", // Campo requerido por la rúbrica
                 imageUrl = imageUri
             )
             petPlantRepository.addPet(newPet)
         } else {
-            val newPlant = Plant(
+            val newPlant = PlantEntity(
                 name = name,
                 type = "Planta",
                 species = breedOrType,
+                wateringFrequency = "$frequencyType $frequencyValue",
                 imageUrl = imageUri
             )
             petPlantRepository.addPlant(newPlant)
         }
 
-        // 2. Guardar el Recordatorio
-        val reminder = Reminder(
-            id = UUID.randomUUID().toString(),
-            targetId = name,
+        // 2. Guardar el Recordatorio vinculado al ID de la entidad
+        val reminder = ReminderEntity(
+            targetId = generatedId,
             category = category,
-            breedOrType = breedOrType,
             action = action,
             frequency = "$frequencyType $frequencyValue",
             message = message,

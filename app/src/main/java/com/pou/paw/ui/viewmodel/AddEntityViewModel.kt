@@ -4,11 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pou.paw.data.model.Pet
-import com.pou.paw.data.model.Plant
-import com.pou.paw.data.model.Reminder
-import com.pou.paw.data.repository.IPetPlantRepository
-import com.pou.paw.data.repository.IReminderRepository
 import com.pou.paw.domain.usecase.SaveReminderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*

@@ -1,17 +1,17 @@
 package com.pou.paw.data.local
 
 import androidx.room.*
-import com.pou.paw.data.model.Pet
+import com.pou.paw.data.model.PetEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PetDao {
     @Query("SELECT * FROM pets")
-    fun getAllPets(): Flow<List<Pet>>
+    fun getAllPets(): Flow<List<PetEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPet(pet: Pet)
+    suspend fun insertPet(pet: PetEntity): Long
 
     @Delete
-    suspend fun deletePet(pet: Pet)
+    suspend fun deletePet(pet: PetEntity)
 }

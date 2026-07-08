@@ -7,4 +7,5 @@ interface IStatsRepository {
     val userStats: Flow<UserStats>
     suspend fun updateStreak(days: Int)
     suspend fun incrementTasks()
+    suspend fun addAchievement(achievement: String)
 }
