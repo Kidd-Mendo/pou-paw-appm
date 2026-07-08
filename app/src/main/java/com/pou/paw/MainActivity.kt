@@ -2,9 +2,10 @@ package com.pou.paw
 
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
 import androidx.core.os.LocaleListCompat
 import com.pou.paw.ui.AppNavigation
@@ -12,15 +13,14 @@ import com.pou.paw.ui.theme.PouPawTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         val prefs = getSharedPreferences("root_paw_settings", Context.MODE_PRIVATE)
         
-        // Al arrancar, forzamos el idioma que esté guardado (por defecto Español "es")
+        // Configuración de idioma inicial
         val langCode = prefs.getString("language", "es") ?: "es"
-        
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(langCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
 
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
                 mutableStateOf(prefs.getString("theme", "Claro") ?: "Claro") 
             }
 
-            // Escuchar cambios en SharedPreferences en tiempo real
+            // Escuchar cambios en preferencias en tiempo real
             val listener = remember {
                 android.content.SharedPreferences.OnSharedPreferenceChangeListener { p, key ->
                     if (key == "theme") {
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             val isDarkTheme = when (themePref) {
                 "Oscuro" -> true
                 "Claro" -> false
-                else -> androidx.compose.foundation.isSystemInDarkTheme()
+                else -> isSystemInDarkTheme()
             }
 
             PouPawTheme(darkTheme = isDarkTheme) {
