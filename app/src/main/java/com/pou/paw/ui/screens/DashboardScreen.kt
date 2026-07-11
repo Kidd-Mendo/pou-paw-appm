@@ -17,10 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
+import coil.compose.AsyncImage
 import com.pou.paw.R
 import com.pou.paw.data.model.PetEntity
 import com.pou.paw.data.model.PlantEntity
@@ -183,12 +185,21 @@ fun PetCard(pet: PetEntity, onComplete: () -> Unit) {
                         .clip(RoundedCornerShape(20.dp))
                         .background(MaterialTheme.colorScheme.secondaryContainer)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Pets,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.Center).size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if (!pet.imageUrl.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = pet.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Pets,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.Center).size(40.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -238,12 +249,21 @@ fun PlantCard(plant: PlantEntity, onComplete: () -> Unit) {
                         .clip(RoundedCornerShape(20.dp))
                         .background(MaterialTheme.colorScheme.secondaryContainer)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Eco,
-                        contentDescription = null,
-                        modifier = Modifier.align(Alignment.Center).size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if (!plant.imageUrl.isNullOrEmpty()) {
+                        AsyncImage(
+                            model = plant.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Eco,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.Center).size(40.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -283,7 +303,7 @@ fun NeedIndicator(name: String, level: Float, icon: ImageVector, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.size(55.dp)) {
             CircularProgressIndicator(
-                progress = level,
+                progress = { level },
                 modifier = Modifier.fillMaxSize(),
                 strokeWidth = 6.dp,
                 color = color,
