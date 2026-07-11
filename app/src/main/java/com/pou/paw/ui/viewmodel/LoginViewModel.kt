@@ -1,6 +1,5 @@
 package com.pou.paw.ui.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pou.paw.data.repository.ISettingsRepository
@@ -19,7 +18,6 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val settingsRepository: ISettingsRepository
 ) : ViewModel() {
 
