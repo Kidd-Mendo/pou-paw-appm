@@ -19,6 +19,9 @@ class SettingsRepository @Inject constructor(private val prefs: SharedPreference
     private val _userEmail = MutableStateFlow(prefs.getString("user_email", "") ?: "")
     override val userEmail: Flow<String> = _userEmail.asStateFlow()
 
+    private val _userPhotoUri = MutableStateFlow(prefs.getString("user_photo_uri", null))
+    override val userPhotoUri: Flow<String?> = _userPhotoUri.asStateFlow()
+
     override suspend fun setTheme(theme: String) {
         prefs.edit().putString("theme", theme).apply()
         _theme.value = theme
@@ -29,9 +32,21 @@ class SettingsRepository @Inject constructor(private val prefs: SharedPreference
         _language.value = language
     }
 
-    override suspend fun updateProfile(name: String, email: String) {
-        prefs.edit().putString("user_name", name).putString("user_email", email).apply()
+    override suspend fun updateProfile(name: String, email: String, photoUri: String?) {
+        val editor = prefs.edit()
+            .putString("user_name", name)
+            .putString("user_email", email)
+        
+        if (photoUri != null) {
+            editor.putString("user_photo_uri", photoUri)
+        }
+        
+        editor.apply()
+        
         _userName.value = name
         _userEmail.value = email
+        if (photoUri != null) {
+            _userPhotoUri.value = photoUri
+        }
     }
 }

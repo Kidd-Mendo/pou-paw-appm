@@ -7,8 +7,9 @@ interface ISettingsRepository {
     val language: Flow<String>
     val userName: Flow<String>
     val userEmail: Flow<String>
+    val userPhotoUri: Flow<String?>
     
     suspend fun setTheme(theme: String)
     suspend fun setLanguage(language: String)
-    suspend fun updateProfile(name: String, email: String)
+    suspend fun updateProfile(name: String, email: String, photoUri: String? = null)
 }

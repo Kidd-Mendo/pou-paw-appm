@@ -1,6 +1,10 @@
 package com.pou.paw.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -11,20 +15,18 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.pou.paw.R
-import com.pou.paw.ui.viewmodel.ProfileViewModel
-
 import com.pou.paw.ui.viewmodel.ProfileUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,8 +36,20 @@ fun ProfileScreen(
     onDashboardClick: () -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    onHistoryClick: () -> Unit
+    onHistoryClick: () -> Unit,
+    onStartEditing: () -> Unit,
+    onCancelEditing: () -> Unit,
+    onSaveProfile: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhotoChange: (Uri) -> Unit
 ) {
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { onPhotoChange(it) }
+    }
+
     Scaffold(
         bottomBar = {
             ProfileBottomNavBar(
@@ -55,7 +69,6 @@ fun ProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Título superior
             Text(
                 text = stringResource(R.string.my_profile),
                 style = MaterialTheme.typography.headlineMedium,
@@ -65,7 +78,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Fotografía de perfil circular y datos básicos
+            // Perfil y Foto
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -74,83 +87,144 @@ fun ProfileScreen(
                     modifier = Modifier
                         .size(120.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer),
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .clickable { launcher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    if (uiState.photoUri != null) {
+                        AsyncImage(
+                            model = uiState.photoUri,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            modifier = Modifier.size(80.dp),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    
+                    // Icono de edición sobre la foto
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                Text(
-                    text = uiState.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = uiState.email,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                )
+                if (!uiState.isEditing) {
+                    Text(
+                        text = uiState.name,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Text(
+                        text = uiState.email,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Tarjeta principal con información de la cuenta
+            // Tarjeta de información
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    AccountInfoItem(
-                        label = stringResource(R.string.full_name),
-                        value = uiState.name,
-                        icon = Icons.Default.Badge
-                    )
-                    AccountInfoItem(
-                        label = stringResource(R.string.email),
-                        value = uiState.email,
-                        icon = Icons.Default.Email
-                    )
-                    AccountInfoItem(
-                        label = stringResource(R.string.reg_date),
-                        value = uiState.registrationDate,
-                        icon = Icons.Default.CalendarToday
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Button(
-                        onClick = { /* TODO: Navegar a edición */ },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
+                    if (uiState.isEditing) {
+                        OutlinedTextField(
+                            value = uiState.editName,
+                            onValueChange = onNameChange,
+                            label = { Text(stringResource(R.string.full_name)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
                         )
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.edit_profile), fontWeight = FontWeight.Bold)
+                        OutlinedTextField(
+                            value = uiState.editEmail,
+                            onValueChange = onEmailChange,
+                            label = { Text(stringResource(R.string.email)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = onCancelEditing,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(stringResource(R.string.cancel_button))
+                            }
+                            Button(
+                                onClick = onSaveProfile,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(stringResource(R.string.save))
+                            }
+                        }
+                    } else {
+                        AccountInfoItem(
+                            label = stringResource(R.string.full_name),
+                            value = uiState.name,
+                            icon = Icons.Default.Badge
+                        )
+                        AccountInfoItem(
+                            label = stringResource(R.string.email),
+                            value = uiState.email,
+                            icon = Icons.Default.Email
+                        )
+                        AccountInfoItem(
+                            label = stringResource(R.string.reg_date),
+                            value = uiState.registrationDate,
+                            icon = Icons.Default.CalendarToday
+                        )
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Button(
+                            onClick = onStartEditing,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.edit_profile), fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Sección Resumen
+            // Resumen
             Text(
                 text = stringResource(R.string.summary),
                 style = MaterialTheme.typography.titleLarge,
@@ -160,7 +234,6 @@ fun ProfileScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Tarjetas estadísticas
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(
                     title = stringResource(R.string.registered_pets),
@@ -178,7 +251,7 @@ fun ProfileScreen(
                     title = stringResource(R.string.active_reminders),
                     value = uiState.activeRemindersCount.toString(),
                     icon = "🔔",
-                    backgroundColor = Color(0xFFFFE0B2) // Un naranja suave
+                    backgroundColor = Color(0xFFFFE0B2)
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
