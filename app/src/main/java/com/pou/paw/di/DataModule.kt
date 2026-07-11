@@ -3,6 +3,7 @@ package com.pou.paw.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.pou.paw.data.local.AppDatabase
+import com.pou.paw.data.local.BreedDao
 import com.pou.paw.data.local.PetDao
 import com.pou.paw.data.local.PlantDao
 import com.pou.paw.data.local.ReminderDao
@@ -58,6 +59,9 @@ object DataModule {
 
     @Provides
     fun providePlantDao(database: AppDatabase): PlantDao = database.plantDao()
+
+    @Provides
+    fun provideBreedDao(database: AppDatabase): BreedDao = database.breedDao()
 
     @Provides
     @Singleton

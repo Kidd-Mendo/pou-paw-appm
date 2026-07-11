@@ -3,6 +3,7 @@ package com.pou.paw.data.repository
 import kotlinx.coroutines.flow.Flow
 
 interface IPetBreedRepository {
-    suspend fun getBreeds(): List<String>
+    val breeds: Flow<List<String>>
+    suspend fun refreshBreeds()
     suspend fun getRandomImage(breed: String? = null): String?
 }

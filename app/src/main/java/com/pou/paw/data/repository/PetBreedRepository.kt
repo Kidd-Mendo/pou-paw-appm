@@ -1,24 +1,29 @@
 package com.pou.paw.data.repository
 
+import com.pou.paw.data.local.BreedDao
+import com.pou.paw.data.model.BreedEntity
 import com.pou.paw.data.remote.PetApiService
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PetBreedRepository @Inject constructor(
-    private val apiService: PetApiService
+    private val apiService: PetApiService,
+    private val breedDao: BreedDao
 ) : IPetBreedRepository {
 
-    override suspend fun getBreeds(): List<String> {
-        return try {
+    override val breeds: Flow<List<String>> = breedDao.getAllBreeds()
+
+    override suspend fun refreshBreeds() {
+        try {
             val response = apiService.getAllBreeds()
             if (response.status == "success") {
-                response.breeds.keys.toList()
-            } else {
-                emptyList()
+                val breedEntities = response.breeds.keys.map { BreedEntity(it) }
+                breedDao.insertBreeds(breedEntities)
             }
         } catch (e: Exception) {
-            emptyList()
+            // Manejar error de red: la UI seguirá viendo los datos locales previos
         }
     }
 

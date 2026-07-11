@@ -53,6 +53,11 @@ data class ReminderEntity(
     val imageUri: String? = null
 )
 
+@Entity(tableName = "breeds")
+data class BreedEntity(
+    @PrimaryKey val name: String
+)
+
 data class UserStats(
     val streakDays: Int = 0,
     val totalTasksCompleted: Int = 0,

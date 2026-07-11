@@ -44,13 +44,21 @@ class AddEntityViewModel @Inject constructor(
     val saveSuccess: SharedFlow<Unit> = _saveSuccess.asSharedFlow()
 
     init {
-        loadBreeds()
+        observeBreeds()
+        refreshBreeds()
     }
 
-    private fun loadBreeds() {
+    private fun observeBreeds() {
+        getBreedsUseCase()
+            .onEach { breeds ->
+                _uiState.update { it.copy(breeds = breeds) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun refreshBreeds() {
         viewModelScope.launch {
-            val breeds = getBreedsUseCase()
-            _uiState.update { it.copy(breeds = breeds) }
+            getBreedsUseCase.refresh()
         }
     }
 
