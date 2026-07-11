@@ -113,7 +113,13 @@ fun AppNavigation() {
                 },
                 onAddClick = { navController.navigate("add") },
                 onSettingsClick = { navController.navigate("settings") },
-                onHistoryClick = { navController.navigate("history") }
+                onHistoryClick = { navController.navigate("history") },
+                onStartEditing = profileViewModel::startEditing,
+                onCancelEditing = profileViewModel::cancelEditing,
+                onSaveProfile = profileViewModel::saveProfile,
+                onNameChange = profileViewModel::onEditNameChange,
+                onEmailChange = profileViewModel::onEditEmailChange,
+                onPhotoChange = { uri -> profileViewModel.updatePhoto(uri.toString()) }
             )
         }
 
