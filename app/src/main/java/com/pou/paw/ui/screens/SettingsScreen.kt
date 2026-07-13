@@ -1,6 +1,8 @@
 package com.pou.paw.ui.screens
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,11 +18,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.pou.paw.R
-
-import com.pou.paw.ui.viewmodel.SettingsViewModel
-
 import com.pou.paw.ui.viewmodel.SettingsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,10 +33,17 @@ fun SettingsScreen(
     onToggleThemeDialog: (Boolean) -> Unit,
     onToggleLanguageDialog: (Boolean) -> Unit,
     onToggleAboutDialog: (Boolean) -> Unit,
+    onTogglePasswordDialog: (Boolean) -> Unit,
+    onToggleNotifications: (Boolean) -> Unit,
+    onToggleReminders: (Boolean) -> Unit,
+    onToggleSounds: (Boolean) -> Unit,
     onSetTheme: (String) -> Unit,
     onSetLanguage: (String) -> Unit,
-    onUpdateProfile: (String, String) -> Unit
+    onUpdateProfile: (String, String) -> Unit,
+    onChangePassword: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,7 +74,7 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Lock,
                     title = stringResource(R.string.change_password),
-                    onClick = { /* TODO: Implement Change Password */ }
+                    onClick = { onTogglePasswordDialog(true) }
                 )
             }
 
@@ -75,17 +82,32 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.Default.Notifications,
                     title = stringResource(R.string.notifications),
-                    onClick = { /* TODO: Implement Notifications Toggle */ }
+                    trailing = {
+                        Switch(
+                            checked = uiState.notificationsEnabled,
+                            onCheckedChange = onToggleNotifications
+                        )
+                    }
                 )
                 SettingsItem(
                     icon = Icons.Default.Schedule,
                     title = stringResource(R.string.reminders),
-                    onClick = { /* TODO: Implement Reminders Toggle */ }
+                    trailing = {
+                        Switch(
+                            checked = uiState.remindersEnabled,
+                            onCheckedChange = onToggleReminders
+                        )
+                    }
                 )
                 SettingsItem(
                     icon = Icons.AutoMirrored.Filled.VolumeUp,
                     title = stringResource(R.string.sounds),
-                    onClick = { /* TODO: Implement Sounds Toggle */ }
+                    trailing = {
+                        Switch(
+                            checked = uiState.soundsEnabled,
+                            onCheckedChange = onToggleSounds
+                        )
+                    }
                 )
             }
 
@@ -108,7 +130,10 @@ fun SettingsScreen(
                 SettingsItem(
                     icon = Icons.AutoMirrored.Filled.Help,
                     title = stringResource(R.string.help),
-                    onClick = { /* TODO: Open Help URL */ }
+                    onClick = { 
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Kidd-Mendo/pou-paw-appm"))
+                        context.startActivity(intent)
+                    }
                 )
                 SettingsItem(
                     icon = Icons.Default.Info,
@@ -149,9 +174,7 @@ fun SettingsScreen(
             title = stringResource(R.string.theme_dialog_title),
             options = themes,
             selectedOption = uiState.currentTheme,
-            onOptionSelected = {
-                onSetTheme(it)
-            },
+            onOptionSelected = onSetTheme,
             onDismissRequest = { onToggleThemeDialog(false) }
         )
     }
@@ -165,9 +188,7 @@ fun SettingsScreen(
             title = stringResource(R.string.language_dialog_title),
             options = languages,
             selectedOption = uiState.currentLanguage,
-            onOptionSelected = {
-                onSetLanguage(it)
-            },
+            onOptionSelected = onSetLanguage,
             onDismissRequest = { onToggleLanguageDialog(false) }
         )
     }
@@ -208,9 +229,7 @@ fun SettingsScreen(
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
-                    onUpdateProfile(name, email)
-                }) {
+                TextButton(onClick = { onUpdateProfile(name, email) }) {
                     Text(stringResource(R.string.save))
                 }
             },
@@ -221,8 +240,33 @@ fun SettingsScreen(
             }
         )
     }
-}
 
+    if (uiState.showPasswordDialog) {
+        var password by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { onTogglePasswordDialog(false) },
+            title = { Text(stringResource(R.string.change_password)) },
+            text = {
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text(stringResource(R.string.password_label)) },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onChangePassword(password) }) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onTogglePasswordDialog(false) }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
 
 @Composable
 fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {
@@ -243,10 +287,12 @@ fun SettingsItem(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    onClick: () -> Unit
+    trailing: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
-        onClick = onClick,
+        onClick = onClick ?: {},
+        enabled = onClick != null,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -274,11 +320,15 @@ fun SettingsItem(
                     )
                 }
             }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            )
+            if (trailing != null) {
+                trailing()
+            } else if (onClick != null) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
+            }
         }
     }
 }

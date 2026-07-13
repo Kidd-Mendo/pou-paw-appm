@@ -3,7 +3,9 @@ package com.pou.paw.data.repository
 import com.pou.paw.data.local.BreedDao
 import com.pou.paw.data.model.BreedEntity
 import com.pou.paw.data.remote.PetApiService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +17,7 @@ class PetBreedRepository @Inject constructor(
 
     override val breeds: Flow<List<String>> = breedDao.getAllBreeds()
 
-    override suspend fun refreshBreeds() {
+    override suspend fun refreshBreeds() = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getAllBreeds()
             if (response.status == "success") {
@@ -27,8 +29,8 @@ class PetBreedRepository @Inject constructor(
         }
     }
 
-    override suspend fun getRandomImage(breed: String?): String? {
-        return try {
+    override suspend fun getRandomImage(breed: String?): String? = withContext(Dispatchers.IO) {
+        try {
             val response = if (breed != null) {
                 apiService.getRandomImageByBreed(breed)
             } else {

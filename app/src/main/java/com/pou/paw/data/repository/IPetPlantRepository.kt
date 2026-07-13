@@ -11,4 +11,6 @@ interface IPetPlantRepository {
     val petPlants: Flow<List<PouEntity>>
     suspend fun addPet(pet: PetEntity): Long
     suspend fun addPlant(plant: PlantEntity): Long
+    suspend fun updatePet(pet: PetEntity)
+    suspend fun updatePlant(plant: PlantEntity)
 }

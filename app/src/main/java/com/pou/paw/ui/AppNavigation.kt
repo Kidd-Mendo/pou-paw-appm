@@ -95,9 +95,14 @@ fun AppNavigation() {
                 onToggleThemeDialog = settingsViewModel::toggleThemeDialog,
                 onToggleLanguageDialog = settingsViewModel::toggleLanguageDialog,
                 onToggleAboutDialog = settingsViewModel::toggleAboutDialog,
+                onTogglePasswordDialog = settingsViewModel::togglePasswordDialog,
+                onToggleNotifications = settingsViewModel::toggleNotifications,
+                onToggleReminders = settingsViewModel::toggleReminders,
+                onToggleSounds = settingsViewModel::toggleSounds,
                 onSetTheme = settingsViewModel::setTheme,
                 onSetLanguage = settingsViewModel::setLanguage,
-                onUpdateProfile = settingsViewModel::updateProfile
+                onUpdateProfile = settingsViewModel::updateProfile,
+                onChangePassword = settingsViewModel::changePassword
             )
         }
 

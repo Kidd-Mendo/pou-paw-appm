@@ -3,9 +3,11 @@ package com.pou.paw.data.repository
 import android.content.SharedPreferences
 import javax.inject.Inject
 import com.pou.paw.data.model.UserStats
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 
 class StatsRepository @Inject constructor(private val prefs: SharedPreferences) : IStatsRepository {
     private val _stats = MutableStateFlow(
@@ -17,12 +19,12 @@ class StatsRepository @Inject constructor(private val prefs: SharedPreferences) 
     )
     override val userStats: Flow<UserStats> = _stats.asStateFlow()
 
-    override suspend fun updateStreak(days: Int) {
+    override suspend fun updateStreak(days: Int) = withContext(Dispatchers.IO) {
         prefs.edit().putInt("streak_days", days).apply()
         _stats.value = _stats.value.copy(streakDays = days)
     }
 
-    override suspend fun incrementTasks() {
+    override suspend fun incrementTasks() = withContext(Dispatchers.IO) {
         val newTotal = _stats.value.totalTasksCompleted + 1
         prefs.edit().putInt("total_tasks", newTotal).apply()
         _stats.value = _stats.value.copy(totalTasksCompleted = newTotal)
@@ -31,7 +33,7 @@ class StatsRepository @Inject constructor(private val prefs: SharedPreferences) 
         checkTaskAchievements(newTotal)
     }
 
-    override suspend fun addAchievement(achievement: String) {
+    override suspend fun addAchievement(achievement: String) = withContext(Dispatchers.IO) {
         val current = _stats.value.achievements.toMutableList()
         if (!current.contains(achievement)) {
             current.add(achievement)

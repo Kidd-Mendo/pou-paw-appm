@@ -30,4 +30,12 @@ class PetPlantRepository @Inject constructor(
     override suspend fun addPlant(plant: PlantEntity): Long = withContext(Dispatchers.IO) {
         plantDao.insertPlant(plant)
     }
+
+    override suspend fun updatePet(pet: PetEntity) = withContext(Dispatchers.IO) {
+        petDao.updatePet(pet)
+    }
+
+    override suspend fun updatePlant(plant: PlantEntity) = withContext(Dispatchers.IO) {
+        plantDao.updatePlant(plant)
+    }
 }

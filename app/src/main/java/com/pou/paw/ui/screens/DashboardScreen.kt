@@ -34,7 +34,7 @@ import com.pou.paw.ui.viewmodel.DashboardUiState
 fun DashboardScreen(
     uiState: DashboardUiState,
     onFilterSelected: (String) -> Unit,
-    onCompleteTask: (PouEntity) -> Unit,
+    onCompleteTask: (PouEntity, String) -> Unit,
     onAddClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onProfileClick: () -> Unit
@@ -68,8 +68,14 @@ fun DashboardScreen(
                 ) {
                     items(uiState.items) { item ->
                         when (item) {
-                            is PetEntity -> PetCard(pet = item, onComplete = { onCompleteTask(item) })
-                            is PlantEntity -> PlantCard(plant = item, onComplete = { onCompleteTask(item) })
+                            is PetEntity -> PetCard(
+                                pet = item, 
+                                onComplete = { needName -> onCompleteTask(item, needName) }
+                            )
+                            is PlantEntity -> PlantCard(
+                                plant = item, 
+                                onComplete = { needName -> onCompleteTask(item, needName) }
+                            )
                         }
                     }
                 }
@@ -171,7 +177,7 @@ fun FilterItem(text: String, icon: ImageVector, isSelected: Boolean, onClick: ()
 }
 
 @Composable
-fun PetCard(pet: PetEntity, onComplete: () -> Unit) {
+fun PetCard(pet: PetEntity, onComplete: (String) -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -217,13 +223,25 @@ fun PetCard(pet: PetEntity, onComplete: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
-                NeedIndicator(stringResource(R.string.need_food), 0.4f, Icons.Default.Restaurant, ProgressRed)
-                NeedIndicator(stringResource(R.string.need_water), 0.8f, Icons.Default.WaterDrop, ProgressBlue)
-                NeedIndicator(stringResource(R.string.need_cleaning), 0.2f, Icons.Default.CleaningServices, ProgressGreen)
+                pet.needs.forEach { need ->
+                    val icon = when(need.name) {
+                        stringResource(R.string.need_food) -> Icons.Default.Restaurant
+                        stringResource(R.string.need_water) -> Icons.Default.WaterDrop
+                        else -> Icons.Default.CleaningServices
+                    }
+                    val color = when(need.name) {
+                        stringResource(R.string.need_food) -> ProgressRed
+                        stringResource(R.string.need_water) -> ProgressBlue
+                        else -> ProgressGreen
+                    }
+                    NeedIndicator(need.name, need.level, icon, color) {
+                        onComplete(need.name)
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = onComplete,
+                onClick = { onComplete(pet.needs.firstOrNull()?.name ?: "") },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
@@ -235,7 +253,7 @@ fun PetCard(pet: PetEntity, onComplete: () -> Unit) {
 }
 
 @Composable
-fun PlantCard(plant: PlantEntity, onComplete: () -> Unit) {
+fun PlantCard(plant: PlantEntity, onComplete: (String) -> Unit) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -281,13 +299,25 @@ fun PlantCard(plant: PlantEntity, onComplete: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(20.dp))
             Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
-                NeedIndicator(stringResource(R.string.need_water), 0.75f, Icons.Default.WaterDrop, ProgressBlue)
-                NeedIndicator(stringResource(R.string.need_light), 0.9f, Icons.Default.WbSunny, ProgressYellow)
-                NeedIndicator(stringResource(R.string.need_nutrient), 0.4f, Icons.Default.Grass, ProgressGreen)
+                plant.needs.forEach { need ->
+                    val icon = when(need.name) {
+                        stringResource(R.string.need_water) -> Icons.Default.WaterDrop
+                        stringResource(R.string.need_light) -> Icons.Default.WbSunny
+                        else -> Icons.Default.Grass
+                    }
+                    val color = when(need.name) {
+                        stringResource(R.string.need_water) -> ProgressBlue
+                        stringResource(R.string.need_light) -> ProgressYellow
+                        else -> ProgressGreen
+                    }
+                    NeedIndicator(need.name, need.level, icon, color) {
+                        onComplete(need.name)
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = onComplete,
+                onClick = { onComplete(plant.needs.firstOrNull()?.name ?: "") },
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
@@ -299,8 +329,8 @@ fun PlantCard(plant: PlantEntity, onComplete: () -> Unit) {
 }
 
 @Composable
-fun NeedIndicator(name: String, level: Float, icon: ImageVector, color: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun NeedIndicator(name: String, level: Float, icon: ImageVector, color: Color, onClick: () -> Unit = {}) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick() }) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.size(55.dp)) {
             CircularProgressIndicator(
                 progress = { level },

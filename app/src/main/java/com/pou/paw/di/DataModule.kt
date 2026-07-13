@@ -2,6 +2,7 @@ package com.pou.paw.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.work.WorkManager
 import com.pou.paw.data.local.AppDatabase
 import com.pou.paw.data.local.BreedDao
 import com.pou.paw.data.local.PetDao
@@ -67,5 +68,11 @@ object DataModule {
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("root_paw_settings", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
+        return WorkManager.getInstance(context)
     }
 }
