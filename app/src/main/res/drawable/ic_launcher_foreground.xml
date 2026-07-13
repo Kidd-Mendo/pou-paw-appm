@@ -1,23 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Outer Green Ring -->
     <path
-        android:fillColor="#F5F5DC"
-        android:pathData="M54,54m-44,0a44,44 0,1 1,88 0a44,44 0,1 1,-88 0" />
-    <path
-        android:fillColor="#4C704C"
-        android:pathData="M54,12C30.8,12 12,30.8 12,54C12,77.2 30.8,96 54,96C77.2,96 96,77.2 96,54C96,30.8 77.2,12 54,12ZM54,92C33,92 16,75 16,54C16,33 33,16 54,16C75,16 92,33 92,54C92,75 75,92 54,92Z" />
-    <path
-        android:fillColor="#D2B48C"
-        android:pathData="M54,30c-11,0 -20,9 -20,20s9,20 20,20s20,-9 20,-20S65,30 54,30z" />
-    <path
-        android:fillColor="#8B4513"
-        android:pathData="M44,45c-2,0 -4,2 -4,4s2,4 4,4s4,-2 4,-4S46,45 44,45zM64,45c-2,0 -4,2 -4,4s2,4 4,4s4,-2 4,-4S66,45 64,45z" />
+        android:strokeColor="#4C704C"
+        android:strokeWidth="1.5"
+        android:pathData="M54,54m-42,0a42,42 0,1 1,84 0a42,42 0,1 1,-84 0" />
+
+    <!-- Laurels / Leaves (Simplified representation) -->
     <path
         android:fillColor="#4C704C"
-        android:pathData="M35,70l5,2l-2,5zM73,70l-5,2l2,5zM54,75l-10,-5l5,-2l5,2l5,-2l5,2z" />
+        android:pathData="M25,35c-2,-2 -5,0 -5,2s3,4 5,2z M22,45c-2,-2 -5,0 -5,2s3,4 5,2z M25,55c-2,-2 -5,0 -5,2s3,4 5,2z" />
+    <path
+        android:fillColor="#4C704C"
+        android:pathData="M83,35c2,-2 5,0 5,2s-3,4 -5,2z M86,45c2,-2 5,0 5,2s-3,4 -5,2z M83,55c2,-2 5,0 5,2s-3,4 -5,2z" />
+
+    <!-- Dog Face (Main Head) -->
+    <path
+        android:fillColor="#E1A95F"
+        android:pathData="M54,28c-12,0 -20,8 -20,20c0,10 8,16 20,20c12,-4 20,-10 20,-20C74,36 66,28 54,28z" />
+
+    <!-- Dog Ears -->
+    <path
+        android:fillColor="#C68E46"
+        android:pathData="M34,40c-2,0 -6,4 -6,10s4,10 6,10z M74,40c2,0 6,4 6,10s-4,10 -6,10z" />
+
+    <!-- Eyes (Closed/Happy) -->
+    <path
+        android:strokeColor="#5D4037"
+        android:strokeWidth="1"
+        android:pathData="M44,48c2,-2 6,-2 8,0 M60,48c2,-2 6,-2 8,0" />
+
+    <!-- Nose -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M54,58m-2.5,0a2.5,1.5 0,1 1,5 0a2.5,1.5 0,1 1,-5 0" />
+
+    <!-- Smile -->
+    <path
+        android:strokeColor="#5D4037"
+        android:strokeWidth="1"
+        android:pathData="M48,62c2,2 10,2 12,0" />
+
+    <!-- Monstera Leaf (Green leaf near face) -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M68,55c2,0 5,5 2,8c-3,3 -8,0 -2,-8z" />
+
+    <!-- Text area representation (Green bar) -->
+    <path
+        android:fillColor="#4C704C"
+        android:pathData="M35,75h38v4h-38z" />
+
 </vector>
